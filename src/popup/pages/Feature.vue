@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { translate } from '~/logic/translate'
-import { app } from '~/logic/firecrawl'
+import { fire } from '~/logic/firecrawl'
 import Button from '~/components/form/form-button.vue'
 import Loading from '~/components/loading/loading.vue'
 
@@ -69,7 +69,7 @@ const firecrawler = async () => {
     return
   }
 
-  const scrapeResponse = await app.scrapeUrl(url.value, types)
+  const scrapeResponse = await fire(url.value, types)
   if (scrapeResponse) {
     result.value = scrapeResponse.markdown
     isLoaded.value = false

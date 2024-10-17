@@ -1,24 +1,29 @@
-import FirecrawlApp from '@mendable/firecrawl-js'
+import FirecrawlApp, { ScrapeParams } from '@mendable/firecrawl-js';
 
-interface Settings {
-  fireCrawl: string
-}
+export const fire = async (url: string, types: ScrapeParams<any>) => {
+  interface Settings {
+    fireCrawl: string;
+  }
 
-const getSettings = (): Promise<Settings> => {
-  return new Promise((resolve) => {
-    chrome.storage.sync.get('settings', (data) => {
-      resolve(data.settings)
-    })
-  })
-}
+  const getSettings = (): Promise<Settings> => {
+    return new Promise((resolve) => {
+      chrome.storage.sync.get('settings', (data) => {
+        resolve(data.settings);
+      });
+    });
+  };
 
-const settings: Settings = await getSettings()
+  const settings: Settings = await getSettings();
 
-let fireCrawl = ''
-if (settings) {
-  fireCrawl = settings.fireCrawl
-}
+  if (settings) {
+    const fireCrawl = settings.fireCrawl;
+    console.log(fireCrawl);
 
-export const app = new FirecrawlApp({
-  apiKey: fireCrawl
-})
+    const app = new FirecrawlApp({
+      apiKey: fireCrawl
+    });
+
+    const res = await app.scrapeUrl(url, types);
+    return res;
+  }
+};
