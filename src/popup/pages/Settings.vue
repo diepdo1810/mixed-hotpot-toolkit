@@ -1,9 +1,9 @@
 <template>
   <div>
-    <!-- // Delete this component -->
-    <DemoSettings />
-    <!-- // Delete this component -->
+    <Settings />
   </div>
 </template>
-<script setup></script>
+<script setup>
+import Settings from '~/components/Settings.vue';
+</script>
 <style scoped></style>

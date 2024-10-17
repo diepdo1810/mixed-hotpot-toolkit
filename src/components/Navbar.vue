@@ -4,6 +4,10 @@
       <HeroiconsHome />
       <span class="ml-1">Home</span>
     </RouterLink>
+    <RouterLink to="/features" class="nav-link">
+      <HeroiconsChartPie />
+      <span class="ml-1">Features</span>
+    </RouterLink>
     <RouterLink to="/settings" class="nav-link">
       <HeroiconsCog6Tooth />
       <span class="ml-1">Settings</span>

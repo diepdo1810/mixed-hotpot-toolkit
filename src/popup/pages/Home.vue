@@ -1,24 +1,34 @@
 <template>
   <div class="p-4">
-    <!-- //  Put your own content here -->
-    <h1 class="text-base font-semibold text-slate-500">V-Extension</h1>
-    <p class="mt-1">A modern chrome extension starter</p>
-    <hr class="my-2" />
-    <p>Features</p>
-    <ul class="mt-2">
-      <li>⚡️ Instant HMR using Vite</li>
-      <li>🥝 Vue 3 - Composition API, `script setup` syntax</li>
-      <li>💬 Effortless communications - powered by webext-bridge and VueUse storage</li>
-      <li>🍃 Tailwind CSS</li>
-      <li>🦾 TypeScript - type safe</li>
-      <li>📦 Components auto importing</li>
-      <li>🌟 Icons - Access to icons from any iconset directly</li>
-      <li>🌛 Dark Mode - support toggle dark mode</li>
-      <li>📃 Dynamic manifest.json with full type support</li>
+    <!-- Extension Title -->
+    <h1 class="text-lg font-semibold text-slate-700">d-Extension</h1>
+    <p class="mt-1 text-sm text-slate-500">A custom Chrome extension for translation and scraping</p>
+    <hr class="my-4" />
+    
+    <!-- Features Section -->
+    <p class="text-sm font-semibold text-slate-600">Features</p>
+    <ul class="mt-3 space-y-2">
+      <li class="flex items-center">
+        <input type="checkbox" id="translation" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked/>
+        <label for="translation" class="text-slate-600">Translation Feature</label>
+      </li>
+      <li class="flex items-center">
+        <input type="checkbox" id="scrape-url" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked/>
+        <label for="scrape-url" class="text-slate-600">Scrape URL</label>
+      </li>
+      <li class="flex items-center">
+        <input type="checkbox" id="scrape-translate" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked/>
+        <label for="scrape-translate" class="text-slate-600">Scrape and Translate</label>
+      </li>
     </ul>
-    <br />
-    <!-- //  Put your own content here -->
+    
+    <!-- Footer Section -->
+    <div class="mt-6 text-sm text-slate-400">
+      <p>Powered by Vite & Vue 3</p>
+    </div>
   </div>
 </template>
+
 <script setup></script>
+
 <style scoped></style>
