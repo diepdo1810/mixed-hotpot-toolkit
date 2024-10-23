@@ -18,9 +18,9 @@ export const translate = async (
   };
 
   const settings: Settings = await getSettings();
+
   if (settings) {
     const api = settings.api;
-    console.log(api);
 
     const res = await fetch(api, {
       method: 'POST',

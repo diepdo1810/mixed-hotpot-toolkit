@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { translate } from '~/logic/translate'
 import { fire } from '~/logic/firecrawl'
+import { summary } from '~/logic/summary'
 import Button from '~/components/form/form-button.vue'
 import Loading from '~/components/loading/loading.vue'
 
@@ -77,6 +78,31 @@ const firecrawler = async () => {
     isCrawl.value = false
   }
 }
+
+const summaryData = async () => {
+  isLoaded.value = true
+  isDisabled.value = true
+  const text = result.value
+  const texts = text.split('\n')
+
+  if (texts.length === 0) {
+    isLoaded.value = false
+    isDisabled.value = false
+    return
+  }
+
+  let prompt = 'Sử dụng @docs để phân tích và tóm tắt tài liệu một cách kỹ lưỡng. Không chỉ bao gồm các điểm chính mà còn xác định bất kỳ khoảng trống hoặc lĩnh vực nào cần cải thiện. Sau khi tóm tắt, hãy đưa ra các khuyến nghị khả thi dựa trên phân tích. Trả lời bằng tiếng Việt'
+
+  try {
+    const res = await summary(prompt, text)
+    result.value = res
+  } catch (error) {
+    console.error('Error summarizing text:', error)
+  }
+
+  isLoaded.value = false
+  isDisabled.value = false
+}
 </script>
 
 <template>
@@ -136,6 +162,30 @@ const firecrawler = async () => {
                     stroke-linejoin="round"
                     stroke-width="2"
                     d="M18.122 17.645a7.185 7.185 0 0 1-2.656 2.495 7.06 7.06 0 0 1-3.52.853 6.617 6.617 0 0 1-3.306-.718 6.73 6.73 0 0 1-2.54-2.266c-2.672-4.57.287-8.846.887-9.668A4.448 4.448 0 0 0 8.07 6.31 4.49 4.49 0 0 0 7.997 4c1.284.965 6.43 3.258 5.525 10.631 1.496-1.136 2.7-3.046 2.846-6.216 1.43 1.061 3.985 5.462 1.754 9.23Z"
+                  />
+                </svg>
+              </template>
+            </Button>
+          </div>
+
+          <div class="flex items-center space-x-1 rtl:space-x-reverse sm:pe-4">
+            <Button text="summary" :events="'summary'" @summary="summaryData">
+              <template v-slot:icon>
+                <svg
+                  class="w-4 h-4 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6.03v13m0-13c-2.819-.831-4.715-1.076-8.029-1.023A.99.99 0 0 0 3 6v11c0 .563.466 1.014 1.03 1.007 3.122-.043 5.018.212 7.97 1.023m0-13c2.819-.831 4.715-1.076 8.029-1.023A.99.99 0 0 1 21 6v11c0 .563-.466 1.014-1.03 1.007-3.122-.043-5.018.212-7.97 1.023"
                   />
                 </svg>
               </template>

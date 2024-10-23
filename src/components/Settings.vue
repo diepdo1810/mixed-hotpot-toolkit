@@ -1,4 +1,47 @@
 <template>
+  <form @submit.prevent="submit">
+    <div class="p-2">
+      <p class="text-base">Upload settings manual</p>
+      <div class="flex items-center justify-center w-full">
+        <label
+          for="dropzone-file"
+          class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+        >
+          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <svg
+              class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 20 16"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+              />
+            </svg>
+            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+              <span class="font-semibold">Click to upload</span> or drag and
+              drop
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              File should be in <span class="font-semibold">JSON</span> format
+            </p>
+          </div>
+          <input
+            id="dropzone-file"
+            type="file"
+            class="hidden"
+            @change="handleChange($event)"
+          />
+        </label>
+      </div>
+    </div>
+  </form>
+
   <form @submit.prevent="saveSettings">
     <div class="p-2">
       <p class="text-base">Settings</p>
@@ -100,6 +143,40 @@
             </div>
           </div>
         </li>
+        <li class="p-2">
+          <div class="flex items-center justify-between">
+            <p>Gemini</p>
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none"
+              >
+                <svg
+                  class="w-6 h-6 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 9a3 3 0 0 1 3-3m-2 15h4m0-3c0-4.1 4-4.9 4-9A6 6 0 1 0 6 9c0 4 4 5 4 9h4Z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                v-model="values.gemini"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Enter api gemini key"
+              />
+            </div>
+          </div>
+        </li>
       </ul>
     </div>
     <div class="flex items-center justify-center">
@@ -117,11 +194,21 @@
 const values = ref({
   darkMode: false,
   api: '',
-  fireCrawl: ''
+  fireCrawl: '',
+  gemini: ''
 })
 
 const saveSettings = () => {
   chrome.storage.sync.set({ settings: values.value })
+}
+
+const handleChange = (event) => {
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const settingsJson = JSON.parse(e.target.result)
+    chrome.storage.sync.set({ settings: settingsJson })
+  }
+  reader.readAsText(event.target.files[0])
 }
 </script>
 <style scoped></style>

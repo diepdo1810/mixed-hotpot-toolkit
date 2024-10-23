@@ -9,16 +9,20 @@
     <p class="text-sm font-semibold text-slate-600">Features</p>
     <ul class="mt-3 space-y-2">
       <li class="flex items-center">
-        <input type="checkbox" id="translation" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked/>
+        <input type="checkbox" id="translation" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked disabled/>
         <label for="translation" class="text-slate-600">Translation Feature</label>
       </li>
       <li class="flex items-center">
-        <input type="checkbox" id="scrape-url" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked/>
+        <input type="checkbox" id="scrape-url" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked disabled/>
         <label for="scrape-url" class="text-slate-600">Scrape URL</label>
       </li>
       <li class="flex items-center">
-        <input type="checkbox" id="scrape-translate" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked/>
+        <input type="checkbox" id="scrape-translate" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked disabled/>
         <label for="scrape-translate" class="text-slate-600">Scrape and Translate</label>
+      </li>
+      <li class="flex items-center">
+        <input type="checkbox" id="scrape-translate" class="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded" checked disabled/>
+        <label for="scrape-translate" class="text-slate-600">Sumury and Scrape</label>
       </li>
     </ul>
     

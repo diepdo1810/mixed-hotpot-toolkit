@@ -17,7 +17,6 @@ export const fire = async (url: string, types: ScrapeParams<any>) => {
 
   if (settings) {
     const fireCrawl = settings.fireCrawl;
-    console.log(fireCrawl);
 
     const app = new FirecrawlApp({
       apiKey: fireCrawl
