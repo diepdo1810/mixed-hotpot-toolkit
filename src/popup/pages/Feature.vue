@@ -13,6 +13,8 @@ const isCrawl = ref(false)
 const url = ref('')
 const exclude = ref('')
 const include = ref('')
+const isSummary = ref(false)
+const models = ref([])
 
 const translateData = async () => {
   isLoaded.value = true
@@ -49,6 +51,10 @@ const toogleFirecrawl = () => {
   isCrawl.value = !isCrawl.value
 }
 
+const toogleSummary = () => {
+  isSummary.value = !isSummary.value
+}
+
 const firecrawler = async () => {
   isLoaded.value = true
   isDisabled.value = true
@@ -80,6 +86,11 @@ const firecrawler = async () => {
 }
 
 const summaryData = async () => {
+  if (models.value.length === 0) {
+    isLoaded.value = false
+    isDisabled.value = false
+    return
+  }
   isLoaded.value = true
   isDisabled.value = true
   const text = result.value
@@ -94,8 +105,7 @@ const summaryData = async () => {
   let prompt = 'Sử dụng @docs để phân tích và tóm tắt tài liệu một cách kỹ lưỡng. Không chỉ bao gồm các điểm chính mà còn xác định bất kỳ khoảng trống hoặc lĩnh vực nào cần cải thiện. Sau khi tóm tắt, hãy đưa ra các khuyến nghị khả thi dựa trên phân tích. Trả lời bằng tiếng Việt'
 
   try {
-    const res = await summary(prompt, text)
-    result.value = res
+    result.value = await summary(prompt, text, models.value.join(','))
   } catch (error) {
     console.error('Error summarizing text:', error)
   }
@@ -169,7 +179,7 @@ const summaryData = async () => {
           </div>
 
           <div class="flex items-center space-x-1 rtl:space-x-reverse sm:pe-4">
-            <Button text="summary" :events="'summary'" @summary="summaryData">
+            <Button text="summary" :events="'toogleSummary'" @toogleSummary="toogleSummary">
               <template v-slot:icon>
                 <svg
                   class="w-4 h-4 text-gray-800 dark:text-white"
@@ -190,6 +200,32 @@ const summaryData = async () => {
                 </svg>
               </template>
             </Button>
+          </div>
+
+          <div class="col-12">
+            <div class="flex items-center max-w-sm mx-auto" v-if="isSummary">
+              <form class="max-w-sm mx-auto">
+                <select multiple id="countries_multiple" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                v-model="models">
+                  <option selected>Choose Models</option>
+                  <option value="ch">Cohere</option>
+                  <option value="op">Open AI</option>
+                  <option value="gm">Gemini</option>
+                </select>
+              </form>
+              <button
+                @click.prevent="summaryData"
+                type="submit"
+                class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 18.5A2.493 2.493 0 0 1 7.51 20H7.5a2.468 2.468 0 0 1-2.4-3.154 2.98 2.98 0 0 1-.85-5.274 2.468 2.468 0 0 1 .92-3.182 2.477 2.477 0 0 1 1.876-3.344 2.5 2.5 0 0 1 3.41-1.856A2.5 2.5 0 0 1 12 5.5m0 13v-13m0 13a2.493 2.493 0 0 0 4.49 1.5h.01a2.468 2.468 0 0 0 2.403-3.154 2.98 2.98 0 0 0 .847-5.274 2.468 2.468 0 0 0-.921-3.182 2.477 2.477 0 0 0-1.875-3.344A2.5 2.5 0 0 0 14.5 3 2.5 2.5 0 0 0 12 5.5m-8 5a2.5 2.5 0 0 1 3.48-2.3m-.28 8.551a3 3 0 0 1-2.953-5.185M20 10.5a2.5 2.5 0 0 0-3.481-2.3m.28 8.551a3 3 0 0 0 2.954-5.185" />
+                </svg>
+
+                <span class="sr-only">Summary</span>
+              </button>
+            </div>
           </div>
 
           <div class="col-12">

@@ -195,7 +195,8 @@ const values = ref({
   darkMode: false,
   api: '',
   fireCrawl: '',
-  gemini: ''
+  gemini: '',
+  githubToken: '',
 })
 
 const saveSettings = () => {

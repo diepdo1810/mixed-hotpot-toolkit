@@ -54,6 +54,9 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@mendable/firecrawl-js": "^1.6.1",
-    "vue-router": "4"
+    "vue-router": "4",
+    "@azure-rest/ai-inference": "latest",
+    "@azure/core-auth": "latest",
+    "@azure/core-sse": "latest"
   }
 }
