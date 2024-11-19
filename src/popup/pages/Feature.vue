@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { translate } from '~/logic/translate'
 import { fire } from '~/logic/firecrawl'
 import { summary } from '~/logic/summary'
+import { speech } from '~/logic/speech'
 import Button from '~/components/form/form-button.vue'
 import Loading from '~/components/loading/loading.vue'
 
@@ -15,6 +16,12 @@ const exclude = ref('')
 const include = ref('')
 const isSummary = ref(false)
 const models = ref([])
+const isSpeech = ref(false)
+const audioSrc = ref('')
+const voice = ref('namminh')
+const voices = ref(
+  ['henry', 'bwyneth', 'snoop', 'mrbeast', 'gwyneth', 'cliff', 'guy', 'jane', 'matthew', 'benwilson', 'henry', 'bwyneth', 'snoop', 'mrbeast', 'gwyneth', 'benwilson', 'cliff', 'presidential', 'guy', 'jane', 'matthew', 'carly', 'kyle', 'kristy', 'oliver', 'tasha', 'joe', 'lisa', 'george', 'emily', 'rob', 'russell', 'benjamin', 'jenny', 'aria', 'joanna', 'nate', 'mary', 'salli', 'joey', 'ryan', 'sonia', 'oliver', 'amy', 'michael', 'thomas', 'libby', 'narrator', 'brian', 'natasha', 'william', 'freya', 'ken', 'olivia', 'aditi', 'abeo', 'ezinne', 'luke', 'leah', 'willem', 'adri', 'fatima', 'hamdan', 'hala', 'rana', 'bassel', 'bashkar', 'tanishaa', 'kalina', 'borislav', 'joana', 'enric', 'xiaoxiao', 'yunfeng', 'xiaomeng', 'yunjian', 'xiaoyan', 'yunze', 'zhiyu', 'hiumaan', 'wanlung', 'hiujin', 'hsiaochen', 'hsiaoyu', 'yunjhe', 'srecko', 'gabrijela', 'antonin', 'vlasta', 'christel', 'jeppe', 'colette', 'maarten', 'laura', 'ruben', 'dena', 'arnaud', 'anu', 'kert', 'blessica', 'angelo', 'harri', 'selma', 'denise', 'henri', 'celeste', 'claude', 'sylvie', 'jean', 'charline', 'gerard', 'ariane', 'fabrice', 'katja', 'christoph', 'louisa', 'conrad', 'vicki', 'daniel', 'giorgi', 'eka', 'athina', 'nestoras', 'avri', 'hila', 'madhur', 'swara', 'noemi', 'tamas', 'gudrun', 'gunnar', 'gadis', 'ardi', 'irma', 'benigno', 'elsa', 'gianni', 'palmira', 'diego', 'imelda', 'cataldo', 'bianca', 'adriano', 'mayu', 'naoki', 'nanami', 'daichi', 'shiori', 'keita', 'daulet', 'aigul', 'sunhi', 'injoon', 'jimin', 'bongjin', 'seoyeon', 'ona', 'leonas', 'everita', 'nils', 'osman', 'yasmin', 'sagar', 'hemkala', 'iselin', 'finn', 'pernille', 'farid', 'dilara', 'agnieszka', 'marek', 'zofia', 'brenda', 'donato', 'yara', 'fabio', 'leila', 'julio', 'camila', 'thiago', 'fernanda', 'duarte', 'ines', 'cristiano', 'alina', 'emil', 'dariya', 'dmitry', 'tatyana', 'maxim', 'viktoria', 'lukas', 'petra', 'rok', 'sameera', 'thilini', 'saul', 'vera', 'arnau', 'triana', 'gerardo', 'carlota', 'luciano', 'larissa', 'lupe', 'hillevi', 'mattias', 'sofie', 'rehema', 'daudi', 'pallavi', 'valluvar', 'saranya', 'kumar', 'kani', 'surya', 'venba', 'anbu', 'mohan', 'shruti', 'premwadee', 'niwat', 'emel', 'ahmet', 'gul', 'salman', 'uzma', 'asad', 'polina', 'ostap', 'hoaimy', 'namminh', 'orla', 'colm']
+)
 
 const translateData = async () => {
   isLoaded.value = true
@@ -49,10 +56,20 @@ const translateData = async () => {
 
 const toogleFirecrawl = () => {
   isCrawl.value = !isCrawl.value
+  isSpeech.value = false
+  isSummary.value = false
 }
 
 const toogleSummary = () => {
   isSummary.value = !isSummary.value
+  isSpeech.value = false
+  isCrawl.value = false
+}
+
+const toogleSpeech = () => {
+  isSpeech.value = !isSpeech.value
+  isSummary.value = false
+  isCrawl.value = false
 }
 
 const firecrawler = async () => {
@@ -112,6 +129,29 @@ const summaryData = async () => {
 
   isLoaded.value = false
   isDisabled.value = false
+}
+
+const speechData = async () => {
+  isLoaded.value = true
+  isDisabled.value = true
+  if (!result.value) {
+    isLoaded.value = false
+    isDisabled.value = false
+    return
+  }
+
+  try {
+    audioSrc.value = await speech(
+      result.value,
+      voice.value,
+      'speechify'
+    );
+  } catch (error) {
+    console.error('Error in speech generation:', error);
+  } finally {
+    isLoaded.value = false;
+    isDisabled.value = false;
+  }
 }
 </script>
 
@@ -200,6 +240,50 @@ const summaryData = async () => {
                 </svg>
               </template>
             </Button>
+          </div>
+
+          <div class="flex items-center space-x-1 rtl:space-x-reverse sm:pe-4">
+            <Button text="speech" :events="'toogleSpeech'" @toogleSpeech="toogleSpeech">
+              <template v-slot:icon>
+                <svg
+                  class="w-4 h-4 text-gray-800 dark:text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                </svg>
+              </template>
+            </Button>
+          </div>
+
+          <div class="col-12">
+            <div class="flex items-center max-w-sm mx-auto" v-if="isSpeech">
+              <form class="max-w-sm mx-auto">
+                <select
+                  id="countries_multiple"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  v-model="voice">
+                  <option v-for="item in voices" :value="item">{{ item }}</option>
+                </select>
+              </form>
+              <button
+                @click.prevent="speechData"
+                type="submit"
+                class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 32a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm-96-32a96 96 0 1 0 192 0 96 96 0 1 0 -192 0zM96 240c0-35 17.5-71.1 45.2-98.8S205 96 240 96c8.8 0 16-7.2 16-16s-7.2-16-16-16c-45.4 0-89.2 22.3-121.5 54.5S64 194.6 64 240c0 8.8 7.2 16 16 16s16-7.2 16-16z"></path>
+                </svg>
+
+                <span class="sr-only">Speech</span>
+              </button>
+            </div>
           </div>
 
           <div class="col-12">
@@ -385,6 +469,16 @@ const summaryData = async () => {
           required
           :disabled="isDisabled"
         ></textarea>
+
+        <div v-if="audioSrc" class="mt-4">
+          <audio
+            controls
+            class="w-full"
+            :src="audioSrc"
+          >
+            Your browser does not support the audio element.
+          </audio>
+        </div>
 
         <Loading :isLoaded="isLoaded" text="Loading..."></Loading>
       </div>

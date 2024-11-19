@@ -197,6 +197,7 @@ const values = ref({
   fireCrawl: '',
   gemini: '',
   githubToken: '',
+  apiZukijourney: '',
 })
 
 const saveSettings = () => {
