@@ -1,115 +1,56 @@
-[<img src="https://essentials.supersaas.dev/supersaas-banner.png">](http://supersaas.dev?ref=github-vextension)
+ENGLISH | [VIETNAMESE](README_vi.md)
 
-# Modernized Chrome Extension Vite Starter
+# Mixed Hotpot Toolkit
 
-> A [Vite](https://vitejs.dev/) Powered `Modernized Chrome Extension Manifest V3` ([Chrome](https://developer.chrome.com/docs/extensions/mv3/getstarted/)) Starter Template.
+✨ Have you ever wished for an all-in-one "smart assistant" – super intelligent, helpful, and able to handle everything with just one click? 🧐
 
-|  Page Type   |                                                             Light Mode                                                              |                                                             Dark Mode                                                              |
-| :----------: | :---------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------: |
-|  Popup Page  |  ![](https://cdn.jsdelivr.net/gh/xiaoluoboding/image-hub-for-repo@latest/chrome-ext-mv3-starter/202107_extpreview_popup_light.png)  |  ![](https://cdn.jsdelivr.net/gh/xiaoluoboding/image-hub-for-repo@latest/chrome-ext-mv3-starter/202107_extpreview_popup_dark.png)  |
-| Options Page | ![](https://cdn.jsdelivr.net/gh/xiaoluoboding/image-hub-for-repo@latest/chrome-ext-mv3-starter/202107_extpreview_options_light.png) | ![](https://cdn.jsdelivr.net/gh/xiaoluoboding/image-hub-for-repo@latest/chrome-ext-mv3-starter/202107_extpreview_options_dark.png) |
+This story started one day when I was struggling to read a long article, full of complex terms. Honestly, I was too lazy to copy-paste it into Google Translate and didn’t want to use AI to summarize it because it seemed cumbersome. Then, an idea struck! Why not create an "all-in-one" tool to solve all those problems?
 
-## Features
+So, I embarked on the journey of building this "open-source mixed hotpot" – an application that I believe will be incredibly helpful for many. Let’s explore the fascinating features together:
 
-- ⚡️ **Instant HMR** - use **Vite** on dev (no more refresh!)
-- 🥝 Vue 3 - Composition API, [`<script setup>` syntax](https://github.com/vuejs/rfcs/blob/master/active-rfcs/0040-script-setup.md) and more!
-- 💬 Effortless communications - powered by [`webext-bridge`](https://github.com/antfu/webext-bridge) and [VueUse](https://github.com/antfu/vueuse) storage
-- 🧭 Vue Router support - Navigation to pages
-- 🍃 [Tailwind CSS](https://tailwindcss.com/) - on-demand CSS utilities
-- 🦾 [TypeScript](https://www.typescriptlang.org/) - type safe
-- 📦 [Components auto importing](./src/components)
-- 🌟 [Icons](./src/components) - Access to icons from any iconset directly
-- 🌛 Dark Mode - support toggle dark mode
-- 📃 Dynamic `manifest.json` with full type support
+## 🌟 Key Features That Make Life Easier:
 
-## Pre-packed
+1. **One-Click Translation**:  
+   Got an English document you need to understand right away? Don’t worry, this app will quickly translate from English to Vietnamese (and I promise to add more languages soon 😉).
 
-### WebExtension Libraries
+2. **Easy Data Crawling**:  
+   No more manually copying paragraph by paragraph. With just a few simple steps, all the information you need can be downloaded as text, saving you time and effort.
 
-- [`webextension-polyfill-ts`](https://github.com/Lusito/webextension-polyfill-ts) - WebExtension browser API Polyfill with types
-- [`webext-bridge`](https://github.com/antfu/webext-bridge) - effortlessly communication between contexts
+3. **Smart Text Summarization**:  
+   Reading a lengthy article isn’t always the best choice, right? With this feature, one click is all it takes to capture the main content, quickly and without missing a beat!
 
-### Vite Plugins
+4. **Text-to-Speech Conversion**:  
+   Sometimes, it’s better to listen than to read. This feature turns written content into natural-sounding speech – perfect when you’re on the go or just relaxing.
 
-- [`vite-plugin-components`](https://github.com/antfu/vite-plugin-components) - components auto import
+## 🌈 What Makes It Special
 
-### Vue Plugins
+All features are built using open-source technologies, ensuring transparency and quality you can trust.
 
-- [`vue-global-api`](https://github.com/antfu/vue-global-api) - use Vue Composition API globally
-- [VueUse](https://github.com/antfu/vueuse) - collection of useful composition APIs
+## 📚 Some Technologies "Behind the Scenes":
 
-### UI Frameworks
+- **Translation**: [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate)
+- **Data Crawling**: [Firecrawl](https://github.com/mendableai/firecrawl)
+- **Text Summarization**: Gemini + GitHub Models ([GitHub Marketplace](https://github.com/marketplace/models))
+- **Text-to-Speech Conversion**: [API OSS](https://github.com/zukijourney/api-oss)
 
-- [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss) - A utility-first CSS framework for rapid UI development.
+👉 This app has been incredibly helpful in my daily tasks, from quick translations to effective content summarization. If you’re curious about how it works, dive in to experience it for yourself!
 
-### Icons
+[Download the app here](https://drive.google.com/file/d/1KWLsxkbLY_SjhCWCoJxIXci2nwpRgBt0/view?usp=sharing)
 
-- [Iconify](https://iconify.design) - use icons from any icon sets [🔍Icônes](https://icones.netlify.app/)
-- [`vite-plugin-icons`](https://github.com/antfu/vite-plugin-icons) - icons as Vue components
+## 👋 Open Source Blog
 
-### Coding Style
+Oh, and if you love open-source projects as much as I do, check out my little blog! It’s a place where I share my experiences and insights about open-source projects – whether you're a seasoned developer or just starting, you’ll find useful information and inspiration there. 🌱
 
-- Use Composition API with [`<script setup>` SFC syntax](https://github.com/vuejs/rfcs/pull/227)
-- [ESLint](https://eslint.org/) with [@antfu/eslint-config](https://github.com/antfu/eslint-config), single quotes, no semi
+Website: [manguonmo.tech](https://manguonmo.tech)
 
-### Dev tools
+💬 I’d love to hear your thoughts on this idea. If you want to learn more, feel free to leave a comment or send me a message!
 
-- [TypeScript](https://www.typescriptlang.org/)
-- [pnpm](https://pnpm.js.org/) - fast, disk space efficient package manager
-- [tsup](https://github.com/egoist/tsup) - Zero config TypeScript bundler powered by esbuild
-- [esno](https://github.com/antfu/esno) - TypeScript / ESNext node runtime powered by esbuild
-- [npm-run-all](https://github.com/mysticatea/npm-run-all) - Run multiple npm-scripts in parallel or sequential
+Thank you for taking the time to read this. I hope it becomes a new "companion" in your work and study! 😊
 
-## Use the Template
+## Configuration File Setup Guide
 
-### GitHub Template
+PS: To fully utilize the app, you need to download an additional configuration file following these instructions:
 
-[Create a repo from this template on GitHub](https://github.com/xiaoluoboding/chrome-ext-mv3-starter/generate).
-
-### Clone to local
-
-If you prefer to do it manually with the cleaner git history
-
-> If you don't have pnpm installed, run: npm install -g pnpm
-
-```bash
-npx degit xiaoluoboding/chrome-ext-mv3-starter my-extension
-cd my-extension
-pnpm i
-```
-
-## Usage
-
-### Folders
-
-- `src` - background scripts and content scripts & frontend for the extension (popup and options).
-  - `manifest.ts` - manifest for the extension.
-- `extension` - extension package root, also holds assets.
-- `scripts` - development helper scripts.
-
-### Development
-
-```bash
-pnpm dev
-```
-
-Then **load extension in browser with the `extension/` folder**,
-
-### Build
-
-To build the extension, run
-
-```bash
-pnpm build
-```
-
-And then pack files under `extension`.
-
-## Credits
-
-This is a template derived from [antfu/vitesse-webext](https://github.com/antfu/vitesse-webext) and [xiaoluoboding/chrome-ext-mv3-starter](https://github.com/xiaoluoboding/chrome-ext-mv3-starter)
-
-
-## License
-
-[MIT](./LICENSE) - [@xiaoluoboding](https://github.com/xiaoluoboding)
+1. Download the configuration file here: [Configuration File Link](https://drive.google.com/file/d/1_TdC6sK_e6sM4G3Uaicp8DhmKmLj1z9y/view?usp=sharing).
+2. Go to **Settings** in the app, select **Upload Settings Manual**.
+3. Choose the downloaded configuration file and complete the setup.

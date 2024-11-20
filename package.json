@@ -1,9 +1,13 @@
 {
-  "name": "v-extension",
-  "displayName": "VExtension",
-  "description": "Vue 3, Vite and Tailwind css Extension starter",
+  "name": "mixed-hotpot-hero-toolkit",
+  "displayName": "Mixed Hotpot Hero Toolkit",
+  "description": "An all-in-one toolkit extension, leveraging open-source technologies for translation, data crawling, summarization, and text-to-speech conversion.",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
+  "author": {
+    "email": "diepdo1810@gmail.com",
+    "name": "Diep Do"
+  },
   "scripts": {
     "dev": "rimraf extension/dev && run-p dev:*",
     "dev:prepare": "esno scripts/prepare-dev.ts dev",

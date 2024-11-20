@@ -1,216 +1,327 @@
 <template>
-  <form @submit.prevent="submit">
-    <div class="p-2">
-      <p class="text-base">Upload settings manual</p>
-      <div class="flex items-center justify-center w-full">
-        <label
-          for="dropzone-file"
-          class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+  <div class="p-6 space-y-8">
+    <!-- Update Configuration Section -->
+    <div
+      class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+      <div class="flex items-start justify-between">
+        <!-- Left side - Text content -->
+        <div class="space-y-2">
+          <h2 class="text-xl font-semibold text-slate-800">
+            Update Configuration
+          </h2>
+          <p class="text-slate-600 max-w-lg">
+            Update your extension settings with a single click. All your preferences will be applied immediately.
+          </p>
+        </div>
+
+        <!-- Right side - Update button -->
+        <button
+          @click="updateConfig"
+          :disabled="isDisabled"
+          class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transform hover:-translate-y-0.5 transition-all duration-300 group shadow-sm hover:shadow-blue-200 hover:shadow-lg"
         >
-          <div class="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg
-              class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 20 16"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-              />
-            </svg>
-            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              <span class="font-semibold">Click to upload</span> or drag and
-              drop
-            </p>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
-              File should be in <span class="font-semibold">JSON</span> format
-            </p>
-          </div>
-          <input
-            id="dropzone-file"
-            type="file"
-            class="hidden"
-            @change="handleChange($event)"
+          <!-- Animated icon -->
+          <svg
+            class="w-5 h-5 group-hover:rotate-180 transition-transform duration-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          <span class="font-medium">Update Settings</span>
+        </button>
+      </div>
+
+      <!-- Optional: Add status indicator -->
+      <div v-if="configStatus" class="mt-4 flex items-center gap-2 text-sm text-green-600">
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
           />
-        </label>
+        </svg>
+        <span>Settings are up to date</span>
       </div>
     </div>
-  </form>
 
-  <form @submit.prevent="saveSettings">
-    <div class="p-2">
-      <p class="text-base">Settings</p>
-      <ul class="mt-2 p-1 bg-slate-50 border rounded-lg divide-y">
-        <li class="p-2">
-          <div class="flex items-center justify-between">
-            <p>Dark Mode</p>
-            <div class="relative">
-              <input
-                type="checkbox"
-                class="peer sr-only opacity-0"
-                id="toggle"
-                v-model="values.darkMode"
-              />
-              <label
-                for="toggle"
-                class="relative flex h-5 w-9 cursor-pointer items-center rounded-full bg-gray-400 px-0.5 outline-gray-400 transition-colors before:h-4 before:w-4 before:rounded-full before:bg-white before:shadow before:transition-transform before:duration-300 peer-checked:bg-green-500 peer-checked:before:translate-x-full peer-focus-visible:outline peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gray-400 peer-checked:peer-focus-visible:outline-green-500"
-              >
-                <span class="sr-only">Enable</span>
-              </label>
-            </div>
+    <!-- Current Configuration Display -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-slate-800">
+          Current Configuration
+        </h3>
+        <span class="text-sm text-slate-500">Last updated: {{ lastTimeUpdated }}</span>
+      </div>
+
+      <!-- Configuration preview -->
+      <div class="bg-white rounded-lg border border-slate-200 p-4 space-y-3">
+        <!-- Settings list -->
+        <div class="space-y-2">
+          <div
+            v-for="(feature, key) in configFeatures"
+            :key="key"
+            class="flex items-center justify-between py-2 border-b border-slate-100"
+          >
+            <span class="text-slate-600">{{ key }}</span>
+            <span :class="{'text-green-600': feature, 'text-red-600': !feature}">
+              {{ feature ? 'Enabled' : 'Disabled' }}
+            </span>
           </div>
-        </li>
-        <li class="p-2">
-          <div class="flex items-center justify-between">
-            <p>API</p>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none"
-              >
-                <svg
-                  class="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535 1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H20a1 1 0 0 0 1-1Z"
-                  />
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-                  />
-                </svg>
-              </div>
-              <input
-                type="text"
-                v-model="values.api"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Enter api translation"
-              />
-            </div>
-          </div>
-        </li>
-        <li class="p-2">
-          <div class="flex items-center justify-between">
-            <p>Fire Crawl</p>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none"
-              >
-                <svg
-                  class="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M6.94318 11h-.85227l.96023-2.90909h1.07954L9.09091 11h-.85227l-.63637-2.10795h-.02272L6.94318 11Zm-.15909-1.14773h1.60227v.59093H6.78409v-.59093ZM9.37109 11V8.09091h1.25571c.2159 0 .4048.04261.5667.12784.162.08523.2879.20502.3779.35937.0899.15436.1349.33476.1349.5412 0 .20833-.0464.38873-.1392.54119-.0918.15246-.2211.26989-.3878.35229-.1657.0824-.3593.1236-.5809.1236h-.75003v-.61367h.59093c.0928 0 .1719-.0161.2372-.0483.0663-.03314.1169-.08002.152-.14062.036-.06061.054-.13211.054-.21449 0-.08334-.018-.15436-.054-.21307-.0351-.05966-.0857-.10511-.152-.13636-.0653-.0322-.1444-.0483-.2372-.0483h-.2784V11h-.78981Zm3.41481-2.90909V11h-.7898V8.09091h.7898Z"
-                  />
-                  <path
-                    stroke="currentColor"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8.31818 2c-.55228 0-1 .44772-1 1v.72878c-.06079.0236-.12113.04809-.18098.07346l-.55228-.53789c-.38828-.37817-1.00715-.37817-1.39543 0L3.30923 5.09564c-.19327.18824-.30229.44659-.30229.71638 0 .26979.10902.52813.30229.71637l.52844.51468c-.01982.04526-.03911.0908-.05785.13662H3c-.55228 0-1 .44771-1 1v2.58981c0 .5523.44772 1 1 1h.77982c.01873.0458.03802.0914.05783.1366l-.52847.5147c-.19327.1883-.30228.4466-.30228.7164 0 .2698.10901.5281.30228.7164l1.88026 1.8313c.38828.3781 1.00715.3781 1.39544 0l.55228-.5379c.05987.0253.12021.0498.18102.0734v.7288c0 .5523.44772 1 1 1h2.65912c.5523 0 1-.4477 1-1v-.7288c.1316-.0511.2612-.1064.3883-.1657l.5435.2614v.4339c0 .5523.4477 1 1 1H14v.0625c0 .5523.4477 1 1 1h.0909v.0625c0 .5523.4477 1 1 1h.6844l.4952.4823c1.1648 1.1345 3.0214 1.1345 4.1863 0l.2409-.2347c.1961-.191.3053-.454.3022-.7277-.0031-.2737-.1183-.5342-.3187-.7207l-6.2162-5.7847c.0173-.0398.0342-.0798.0506-.12h.7799c.5522 0 1-.4477 1-1V8.17969c0-.55229-.4478-1-1-1h-.7799c-.0187-.04583-.038-.09139-.0578-.13666l.5284-.51464c.1933-.18824.3023-.44659.3023-.71638 0-.26979-.109-.52813-.3023-.71637l-1.8803-1.8313c-.3883-.37816-1.0071-.37816-1.3954 0l-.5523.53788c-.0598-.02536-.1201-.04985-.1809-.07344V3c0-.55228-.4477-1-1-1H8.31818Z"
-                  />
-                </svg>
-              </div>
-              <input
-                type="text"
-                v-model="values.fireCrawl"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Enter api firecrawl key"
-              />
-            </div>
-          </div>
-        </li>
-        <li class="p-2">
-          <div class="flex items-center justify-between">
-            <p>Gemini</p>
-            <div class="relative">
-              <div
-                class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none"
-              >
-                <svg
-                  class="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 9a3 3 0 0 1 3-3m-2 15h4m0-3c0-4.1 4-4.9 4-9A6 6 0 1 0 6 9c0 4 4 5 4 9h4Z"
-                  />
-                </svg>
-              </div>
-              <input
-                type="text"
-                v-model="values.gemini"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Enter api gemini key"
-              />
-            </div>
-          </div>
-        </li>
-      </ul>
+        </div>
+
+        <!-- Optional: Add expand button for full config -->
+        <button
+          class="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-300"
+          @click="showFullConfig"
+        >
+          View full configuration
+        </button>
+      </div>
     </div>
-    <div class="flex items-center justify-center">
-      <button
-        form-type="submit"
-        type="submit"
-        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+
+    <!-- Add modal -->
+    <div
+      v-if="isModalOpen"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
+      @click="isModalOpen = false"
+    >
+      <!-- Modal content -->
+      <div
+        class="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] mx-4 overflow-hidden transform transition-all duration-300 animate-modal-enter"
+        @click.stop
       >
-        Submit
-      </button>
+        <!-- Modal header -->
+        <div
+          class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50">
+          <h3 class="text-lg font-semibold text-slate-800">
+            Full Configuration
+          </h3>
+          <button
+            @click="isModalOpen = false"
+            class="text-slate-400 hover:text-slate-600 transition-colors duration-300"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="p-6 overflow-y-auto max-h-[60vh]">
+          <!-- Configuration sections -->
+          <div class="space-y-6">
+            <!-- General Settings -->
+            <div class="space-y-4">
+              <h4 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">
+                General Settings
+              </h4>
+              <div class="bg-slate-50 rounded-lg p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600">Version</span>
+                  <span class="font-mono text-slate-800">1.0.0</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600">Last Updated</span>
+                  <span class="font-mono text-slate-800">{{ lastDateUpdated }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Feature Settings -->
+            <div class="space-y-4">
+              <h4 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">
+                Feature Settings
+              </h4>
+              <div class="bg-slate-50 rounded-lg p-4 space-y-3">
+                <div class="flex items-center justify-between" v-for="(feature, key) in configFeatures" :key="key">
+                  <span class="text-slate-600">{{ key }}</span>
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                   {{ feature ? 'Enabled' : 'Disabled' }}
+                </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Advanced Settings -->
+            <div class="space-y-4">
+              <h4 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">
+                Advanced Settings
+              </h4>
+              <div class="bg-slate-50 rounded-lg p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600">Cache Duration</span>
+                  <span class="font-mono text-slate-800">30 minutes</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600">Rate Limit</span>
+                  <span class="font-mono text-slate-800">100 requests/hour</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-600">Timeout</span>
+                  <span class="font-mono text-slate-800">5000ms</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Raw JSON -->
+            <div class="space-y-4">
+              <h4
+                class="text-sm font-semibold text-slate-600 uppercase tracking-wider flex items-center justify-between">
+                <span>Raw JSON Configuration</span>
+                <button
+                  @click="copyToClipboard"
+                  class="text-blue-600 hover:text-blue-700 text-xs font-medium transition-colors duration-300 flex items-center gap-1"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  Copy JSON
+                </button>
+              </h4>
+              <pre class="bg-slate-900 rounded-lg p-4 overflow-x-auto">
+              <code class="text-sm font-mono text-slate-100">
+{
+  "version": "0.0.1",
+  "features": {
+    "translation": true,
+    "crawlUrl": true,
+    "textSummary": true,
+    "speechToText": true
+  },
+  "advanced": {
+    "cacheDuration": 1800,
+    "rateLimit": 100,
+    "timeout": 5000
+  }
+}</code>
+            </pre>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </form>
+  </div>
+
+  <!-- Toast Message -->
+  <Transition
+    enter-active-class="transform transition ease-out duration-300"
+    enter-from-class="translate-y-2 opacity-0"
+    enter-to-class="translate-y-0 opacity-100"
+    leave-active-class="transform transition ease-in duration-300"
+    leave-from-class="translate-y-0 opacity-100"
+    leave-to-class="translate-y-2 opacity-0"
+  >
+    <div
+      v-if="showToast"
+      class="fixed bottom-4 right-4 z-50"
+    >
+      <div class="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+        <span class="font-medium">Copied to clipboard!</span>
+      </div>
+    </div>
+  </Transition>
 </template>
+
 <script setup>
-const values = ref({
-  darkMode: false,
-  api: '',
-  fireCrawl: '',
-  gemini: '',
-  githubToken: '',
-  apiZukijourney: '',
+const showToast = ref(false)
+const isModalOpen = ref(false)
+const configStatus = ref(false)
+const configFeatures = ref({
+  'Translation Feature': false,
+  'Crawl URL Feature': false,
+  'Text Summary': false,
+  'Speech to Text': false
+})
+const isDisabled = ref(false)
+const lastTimeUpdated = ref('2 hours ago')
+const lastDateUpdated = ref(new Date().toLocaleTimeString())
+
+chrome.storage.sync.get(['settings'], (result) => {
+  if (result.settings) {
+    configStatus.value = true
+    isDisabled.value = true
+    Object.keys(configFeatures.value).forEach((key) => {
+      configFeatures.value[key] = true
+    })
+  }
 })
 
-const saveSettings = () => {
-  chrome.storage.sync.set({ settings: values.value })
+const updateConfig = async () => {
+  const url = 'https://manguonmopodcast.b-cdn.net/setting.json'
+  try {
+    const response = await fetch(url)
+    const data = await response.json()
+    const lastUpdated = new Date().toLocaleTimeString()
+    if (data) {
+      chrome.storage.sync.set({ settings: data }, () => {
+        configStatus.value = true
+
+        Object.keys(configFeatures.value).forEach((key) => {
+          configFeatures.value[key] = true
+        })
+        lastTimeUpdated.value = lastUpdated + ' ago'
+        lastDateUpdated.value = lastUpdated
+      })
+    }
+  } catch (error) {
+    console.error('Failed to update configuration:', error)
+  }
 }
 
-const handleChange = (event) => {
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    const settingsJson = JSON.parse(e.target.result)
-    chrome.storage.sync.set({ settings: settingsJson })
+const showFullConfig = () => {
+  isModalOpen.value = !isModalOpen.value
+}
+
+const copyToClipboard = () => {
+  const json = `{
+  "version": "0.0.1",
+  "features": {
+    "translation": true,
+    "crawlUrl": true,
+    "textSummary": true,
+    "speechToText": true
+  },
+  "advanced": {
+    "cacheDuration": 1800,
+    "rateLimit": 100,
+    "timeout": 5000
   }
-  reader.readAsText(event.target.files[0])
+}`
+  navigator.clipboard.writeText(json)
+
+  showToast.value = true
+
+  setTimeout(() => {
+    showToast.value = false
+  }, 3000)
 }
 </script>
 <style scoped></style>
