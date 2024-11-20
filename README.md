@@ -35,7 +35,7 @@ All features are built using open-source technologies, ensuring transparency and
 
 👉 This app has been incredibly helpful in my daily tasks, from quick translations to effective content summarization. If you’re curious about how it works, dive in to experience it for yourself!
 
-[Download the app here](https://drive.google.com/file/d/1KWLsxkbLY_SjhCWCoJxIXci2nwpRgBt0/view?usp=sharing)
+[Download the app here](https://github.com/diepdo1810/mixed-hotpot-toolkit/releases/tag/0.0.1)
 
 ## 👋 Open Source Blog
 

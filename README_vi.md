@@ -35,7 +35,7 @@ Tất cả các chức năng của ứng dụng đều được phát triển d�
 
 👉 Ứng dụng này đã giúp mình rất nhiều trong công việc hàng ngày, từ dịch thuật nhanh chóng đến tóm tắt nội dung hiệu quả. Nếu bạn cũng tò mò về cách nó hoạt động, hãy khám phá thêm để trải nghiệm nhé!
 
-[Link tải ứng dụng](https://drive.google.com/file/d/1KWLsxkbLY_SjhCWCoJxIXci2nwpRgBt0/view?usp=sharing)
+[Link tải ứng dụng](https://github.com/diepdo1810/mixed-hotpot-toolkit/releases/tag/0.0.1)
 
 ## 👋 Blog Mã Nguồn Mở
 
