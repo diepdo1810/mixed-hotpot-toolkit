@@ -150,6 +150,11 @@ const summaryData = async () => {
     return;
   }
 
+  if (!result.value) {
+    handleCrawlError('Please enter the text!');
+    return;
+  }
+
   const text = result.value
   const texts = text.split('\n')
 
