@@ -4,7 +4,6 @@ import { translate } from '~/logic/translate'
 import { fire } from '~/logic/firecrawl'
 import { summary } from '~/logic/summary'
 import { speech } from '~/logic/speech'
-import Button from '~/components/form/form-button.vue'
 
 const isLoaded = ref(false)
 const isDisabled = ref(false)
@@ -29,17 +28,35 @@ const voice = ref('namminh')
 const voices = ref(
   ['henry', 'bwyneth', 'snoop', 'mrbeast', 'gwyneth', 'cliff', 'guy', 'jane', 'matthew', 'benwilson', 'henry', 'bwyneth', 'snoop', 'mrbeast', 'gwyneth', 'benwilson', 'cliff', 'presidential', 'guy', 'jane', 'matthew', 'carly', 'kyle', 'kristy', 'oliver', 'tasha', 'joe', 'lisa', 'george', 'emily', 'rob', 'russell', 'benjamin', 'jenny', 'aria', 'joanna', 'nate', 'mary', 'salli', 'joey', 'ryan', 'sonia', 'oliver', 'amy', 'michael', 'thomas', 'libby', 'narrator', 'brian', 'natasha', 'william', 'freya', 'ken', 'olivia', 'aditi', 'abeo', 'ezinne', 'luke', 'leah', 'willem', 'adri', 'fatima', 'hamdan', 'hala', 'rana', 'bassel', 'bashkar', 'tanishaa', 'kalina', 'borislav', 'joana', 'enric', 'xiaoxiao', 'yunfeng', 'xiaomeng', 'yunjian', 'xiaoyan', 'yunze', 'zhiyu', 'hiumaan', 'wanlung', 'hiujin', 'hsiaochen', 'hsiaoyu', 'yunjhe', 'srecko', 'gabrijela', 'antonin', 'vlasta', 'christel', 'jeppe', 'colette', 'maarten', 'laura', 'ruben', 'dena', 'arnaud', 'anu', 'kert', 'blessica', 'angelo', 'harri', 'selma', 'denise', 'henri', 'celeste', 'claude', 'sylvie', 'jean', 'charline', 'gerard', 'ariane', 'fabrice', 'katja', 'christoph', 'louisa', 'conrad', 'vicki', 'daniel', 'giorgi', 'eka', 'athina', 'nestoras', 'avri', 'hila', 'madhur', 'swara', 'noemi', 'tamas', 'gudrun', 'gunnar', 'gadis', 'ardi', 'irma', 'benigno', 'elsa', 'gianni', 'palmira', 'diego', 'imelda', 'cataldo', 'bianca', 'adriano', 'mayu', 'naoki', 'nanami', 'daichi', 'shiori', 'keita', 'daulet', 'aigul', 'sunhi', 'injoon', 'jimin', 'bongjin', 'seoyeon', 'ona', 'leonas', 'everita', 'nils', 'osman', 'yasmin', 'sagar', 'hemkala', 'iselin', 'finn', 'pernille', 'farid', 'dilara', 'agnieszka', 'marek', 'zofia', 'brenda', 'donato', 'yara', 'fabio', 'leila', 'julio', 'camila', 'thiago', 'fernanda', 'duarte', 'ines', 'cristiano', 'alina', 'emil', 'dariya', 'dmitry', 'tatyana', 'maxim', 'viktoria', 'lukas', 'petra', 'rok', 'sameera', 'thilini', 'saul', 'vera', 'arnau', 'triana', 'gerardo', 'carlota', 'luciano', 'larissa', 'lupe', 'hillevi', 'mattias', 'sofie', 'rehema', 'daudi', 'pallavi', 'valluvar', 'saranya', 'kumar', 'kani', 'surya', 'venba', 'anbu', 'mohan', 'shruti', 'premwadee', 'niwat', 'emel', 'ahmet', 'gul', 'salman', 'uzma', 'asad', 'polina', 'ostap', 'hoaimy', 'namminh', 'orla', 'colm']
 )
+const showToast = ref(false)
+const messToast = ref('')
+const isToastSuccess = ref(false)
 
+watch(() => showToast.value, (value) => {
+  if (value) {
+    setTimeout(() => {
+      showToast.value = false
+    }, 1500)
+  }
+})
 
 const translateData = async () => {
   isLoaded.value = true
   isDisabled.value = true
+  isCrawl.value = false
+  isSpeech.value = false
+  isSummary.value = false
+
+  if (!result.value) {
+    handleCrawlError('Please enter the text!')
+    return
+  }
+
   const text = result.value
   let texts = text.split('\n')
 
   if (texts.length === 0) {
-    isLoaded.value = false
-    isDisabled.value = false
+    handleCrawlError('Please enter the text!')
     return
   }
 
@@ -53,13 +70,11 @@ const translateData = async () => {
       const res = await translate(item, 'en', 'vi', 'text', 50)
       translatedText += res.translatedText + '\n\n'
       result.value = translatedText
+      handleCrawlSuccess('Translate text successfully')
     } catch (error) {
-      console.error('Error translating text:', error)
+      handleCrawlError('Please check Settings to see if updates have been applied.')
     }
   }
-
-  isLoaded.value = false
-  isDisabled.value = false
 }
 
 const toogleFirecrawl = () => {
@@ -80,89 +95,102 @@ const toogleSpeech = () => {
   isCrawl.value = false
 }
 
-const firecrawler = async () => {
-  isLoaded.value = true
-  isDisabled.value = true
-  const types = {
-    formats: ['markdown', 'html']
-  }
-
-  if (include.value) {
-    types.includeTags = include.value.split(',')
-  }
-
-  if (exclude.value) {
-    types.excludeTags = exclude.value.split(',')
-  }
-
-  if (!url.value) {
-    isLoaded.value = false
-    isDisabled.value = false
-    return
-  }
-
-  const scrapeResponse = await fire(url.value, types)
-  if (scrapeResponse) {
-    result.value = scrapeResponse.markdown
-    isLoaded.value = false
-    isDisabled.value = false
-    isCrawl.value = false
-  }
+const toggleFullscreen = () => {
+  console.log('Toggle fullscreen')
 }
 
-const summaryData = async () => {
-  if (models.value.length === 0) {
-    isLoaded.value = false
-    isDisabled.value = false
-    return
+const handleCrawlSuccess = (message) => {
+  isLoaded.value = false;
+  isDisabled.value = false;
+  isToastSuccess.value = true;
+  showToast.value = true;
+  messToast.value = message;
+};
+
+const handleCrawlError = (message) => {
+  isLoaded.value = false;
+  isDisabled.value = false;
+  isToastSuccess.value = false;
+  showToast.value = true;
+  messToast.value = message;
+};
+
+const firecrawler = async () => {
+  isLoaded.value = true;
+  isDisabled.value = true;
+
+  const types = {
+    formats: ['markdown', 'html'],
+    includeTags: include.value?.split(',') || [],
+    excludeTags: exclude.value?.split(',') || []
+  };
+
+  if (!url.value) {
+    handleCrawlError('Please enter the URL!');
+    return;
   }
+
+  isCrawl.value = false;
+
+  try {
+    const scrapeResponse = await fire(url.value, types);
+    result.value = scrapeResponse.markdown;
+    handleCrawlSuccess('Crawl web successfully');
+  } catch (error) {
+    handleCrawlError('Please check Settings to see if updates have been applied.');
+  }
+};
+
+const summaryData = async () => {
   isLoaded.value = true
   isDisabled.value = true
+
+  if (models.value.length === 0) {
+    handleCrawlError('Please choose a model!');
+    return;
+  }
+
   const text = result.value
   const texts = text.split('\n')
 
   if (texts.length === 0) {
-    isLoaded.value = false
-    isDisabled.value = false
+    handleCrawlError('Please enter the text!');
+
     return
   }
 
   let prompt = 'Sử dụng @docs để phân tích và tóm tắt tài liệu một cách kỹ lưỡng. Không chỉ bao gồm các điểm chính mà còn xác định bất kỳ khoảng trống hoặc lĩnh vực nào cần cải thiện. Sau khi tóm tắt, hãy đưa ra các khuyến nghị khả thi dựa trên phân tích. Trả lời bằng tiếng Việt'
+  isSummary.value = false
 
   try {
     result.value = await summary(prompt, text, selectedModel.value)
+    handleCrawlSuccess('Summary text successfully')
   } catch (error) {
-    console.error('Error summarizing text:', error)
+    handleCrawlError('Please check Settings to see if updates have been applied.')
   }
-
-  isLoaded.value = false
-  isDisabled.value = false
-  isSummary.value = false
 }
 
 const speechData = async () => {
   isLoaded.value = true
   isDisabled.value = true
   if (!result.value) {
-    isLoaded.value = false
-    isDisabled.value = false
+    handleCrawlError('Please enter the text!')
     return
   }
 
   try {
+    isSpeech.value = false
     audioSrc.value = await speech(
       result.value,
       voice.value,
       'speechify'
     )
+    handleCrawlSuccess('Speechify text successfully')
   } catch (error) {
-    console.error('Error in speech generation:', error)
-  } finally {
-    isLoaded.value = false
-    isDisabled.value = false
-    isSpeech.value = false
+    handleCrawlError('Please check Settings to see if updates have been applied.')
   }
 }
+
 </script>
 
 <template>
@@ -172,118 +200,48 @@ const speechData = async () => {
       <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-3">
         <div class="grid grid-cols-5 gap-2">
           <!-- Translate -->
-          <div class="relative group">
-            <button
-              @click="translateData"
-              class="group transition-all duration-300 transform hover:scale-105 hover:shadow p-2 bg-white rounded-lg text-center"
-            >
-              <svg class="w-5 h-5 mx-auto text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                   fill="none" viewBox="0 0 20 16">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8.855 10.322a2.476 2.476 0 1 1 .133-4.241m6.053 4.241a2.475 2.475 0 1 1 .133-4.241M2 1h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z" />
-              </svg>
-            </button>
-
-            <!-- Tooltip -->
-            <div class="absolute z-10 p-1.5 -bottom-6 left-1/2 transform -translate-x-1/2
-              bg-gray-800 text-white text-xs rounded
-              opacity-0 group-hover:opacity-100
-              transition-opacity duration-300
-              pointer-events-none">
-              Translate text
-            </div>
-          </div>
+          <ActionButton
+            iconPath="M8.855 10.322a2.476 2.476 0 1 1 .133-4.241m6.053 4.241a2.475 2.475 0 1 1 .133-4.241M2 1h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1Z"
+            @click="translateData"
+            tooltipText="Translate text"
+            viewBox="0 0 20 16"
+            buttonClass="bg-white text-gray-800"
+          />
 
           <!-- Fire crawl -->
-          <div class="relative group">
-            <button
-              @click="toogleFirecrawl"
-              class="group transition-all duration-300 transform hover:scale-105 hover:shadow p-2 bg-white rounded-lg text-center"
-              :class="isCrawl ? 'ring-1 ring-green-500' : ''"
-            >
-              <svg class="w-5 h-5 mx-auto text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                   fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M18.122 17.645a7.185 7.185 0 0 1-2.656 2.495 7.06 7.06 0 0 1-3.52.853 6.617 6.617 0 0 1-3.306-.718 6.73 6.73 0 0 1-2.54-2.266c-2.672-4.57.287-8.846.887-9.668A4.448 4.448 0 0 0 8.07 6.31 4.49 4.49 0 0 0 7.997 4c1.284.965 6.43 3.258 5.525 10.631 1.496-1.136 2.7-3.046 2.846-6.216 1.43 1.061 3.985 5.462 1.754 9.23Z" />
-              </svg>
-            </button>
-
-            <!-- Tooltip -->
-            <div class="absolute z-10 p-2 -bottom-8 left-1/2 transform -translate-x-1/2
-    bg-gray-800 text-white text-xs rounded-lg
-    opacity-0 group-hover:opacity-100
-    transition-opacity duration-300
-    pointer-events-none">
-              Crawl Web
-            </div>
-          </div>
+          <ActionButton
+            iconPath="M18.122 17.645a7.185 7.185 0 0 1-2.656 2.495 7.06 7.06 0 0 1-3.52.853 6.617 6.617 0 0 1-3.306-.718 6.73 6.73 0 0 1-2.54-2.266c-2.672-4.57.287-8.846.887-9.668A4.448 4.448 0 0 0 8.07 6.31 4.49 4.49 0 0 0 7.997 4c1.284.965 6.43 3.258 5.525 10.631 1.496-1.136 2.7-3.046 2.846-6.216 1.43 1.061 3.985 5.462 1.754 9.23Z"
+            @click="toogleFirecrawl"
+            tooltipText="Crawl Web"
+            viewBox="0 0 24 24"
+            :buttonClass="isCrawl ? 'bg-green-500 text-white' : 'bg-white text-gray-800'"
+          />
 
           <!-- Summary -->
-          <div class="relative group">
-            <button
-              @click="toogleSummary"
-              class="group transition-all duration-300 transform hover:scale-105 hover:shadow p-2 bg-white rounded-lg text-center"
-              :class="isSummary ? 'ring-1 ring-purple-500' : ''"
-            >
-              <svg class="w-5 h-5 mx-auto text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.03v13m0-13c-2.819-.831-4.715-1.076-8.029-1.023A.99.99 0 0 0 3 6v11c0 .563.466 1.014 1.03 1.007 3.122-.043 5.018.212 7.97 1.023m0-13c2.819-.831 4.715-1.076 8.029-1.023A.99.99 0 0 1 21 6v11c0 .563-.466 1.014-1.03 1.007-3.122-.043-5.018.212-7.97 1.023"/>
-              </svg>
-            </button>
-
-            <!-- Tooltip -->
-            <div class="absolute z-10 p-2 -bottom-8 left-1/2 transform -translate-x-1/2
-    bg-gray-800 text-white text-xs rounded-lg
-    opacity-0 group-hover:opacity-100
-    transition-opacity duration-300
-    pointer-events-none">
-              Summary Text
-            </div>
-          </div>
+          <ActionButton
+            iconPath="M12 6.03v13m0-13c-2.819-.831-4.715-1.076-8.029-1.023A.99.99 0 0 0 3 6v11c0 .563.466 1.014 1.03 1.007 3.122-.043 5.018.212 7.97 1.023m0-13c2.819-.831 4.715-1.076 8.029-1.023A.99.99 0 0 1 21 6v11c0 .563-.466 1.014-1.03 1.007-3.122-.043-5.018.212-7.97 1.023"
+            @click="toogleSummary"
+            tooltipText="Summary Text"
+            viewBox="0 0 24 24"
+            :buttonClass="isSummary ? 'bg-purple-500 text-white' : 'bg-white text-gray-800'"
+          />
 
           <!-- Speech -->
-          <div class="relative group">
-            <button
-              @click="toogleSpeech"
-              class="group transition-all duration-300 transform hover:scale-105 hover:shadow p-2 bg-white rounded-lg text-center"
-              :class="isSpeech ? 'ring-1 ring-orange-500' : ''"
-            >
-              <svg class="w-6 h-6 mx-auto text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-              </svg>
-            </button>
-
-            <!-- Tooltip -->
-            <div class="absolute z-10 p-2 -bottom-8 left-1/2 transform -translate-x-1/2
-    bg-gray-800 text-white text-xs rounded-lg
-    opacity-0 group-hover:opacity-100
-    transition-opacity duration-300
-    pointer-events-none">
-              Speechify Text
-            </div>
-          </div>
+          <ActionButton
+            iconPath="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"
+            @click="toogleSpeech"
+            tooltipText="Speechify Text"
+            viewBox="0 0 24 24"
+            :buttonClass="isSpeech ? 'bg-orange-500 text-white' : 'bg-white text-gray-800'"
+          />
 
           <!-- Fullscreen -->
-          <div class="relative group">
-            <button
-              @click="toggleFullscreen"
-              class="group transition-all duration-300 transform hover:scale-105 hover:shadow p-2 bg-white rounded-lg text-center"
-            >
-              <svg class="w-5 h-5 mx-auto text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                   viewBox="0 0 19 19">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M13 1h5m0 0v5m0-5-5 5M1.979 6V1H7m0 16.042H1.979V12M18 12v5.042h-5M13 12l5 5M2 1l5 5m0 6-5 5" />
-              </svg>
-            </button>
-
-            <!-- Tooltip -->
-            <div class="absolute z-10 p-2 -bottom-8 left-1/2 transform -translate-x-1/2
-    bg-gray-800 text-white text-xs rounded-lg
-    opacity-0 group-hover:opacity-100
-    transition-opacity duration-300
-    pointer-events-none">
-              Fullscreen
-            </div>
-          </div>
+          <ActionButton
+            iconPath="M13 1h5m0 0v5m0-5-5 5M1.979 6V1H7m0 16.042H1.979V12M18 12v5.042h-5M13 12l5 5M2 1l5 5m0 6-5 5"
+            @click="toggleFullscreen"
+            tooltipText="Fullscreen"
+            viewBox="0 0 19 19"
+          />
         </div>
       </div>
 
@@ -385,13 +343,13 @@ const speechData = async () => {
         </div>
 
         <!-- Loading Indicator -->
-        <div v-if="isLoaded" class="mt-3 flex justify-center items-center">
-          <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-blue-500"></div>
-          <span class="ml-2 text-gray-600 text-sm">Loading ...</span>
-        </div>
+        <Loading :isLoaded="isLoaded" />
       </div>
     </div>
   </div>
+
+  <!-- Toast Message -->
+  <Toast :text="messToast" :isShow="showToast" :isSuccess="isToastSuccess" />
 </template>
 
 <style>

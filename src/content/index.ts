@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { onMessage } from 'webext-bridge'
 
-console.info('[v-extension] Hello world from content script')
+console.info('[mixed-hot-pot-toolkits] Hello from content script')
 
 // communication example: send previous tab title from background page
 onMessage('tab-prev', ({ data }) => {
-  console.log(`[v-extension] Navigate from page "${data.title}"`)
+  console.log(`[mixed-hot-pot-toolkits] Navigate from page "${data.title}"`)
 })

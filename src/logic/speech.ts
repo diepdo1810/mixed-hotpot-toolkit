@@ -33,6 +33,7 @@ export const speech = async (
       model: model,
       voice: voice,
       input: text,
+      speed: 1.5,
     });
 
     // Convert response to base64 string
