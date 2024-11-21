@@ -131,7 +131,7 @@
               <div class="bg-slate-50 rounded-lg p-4 space-y-3">
                 <div class="flex items-center justify-between">
                   <span class="text-slate-600">Version</span>
-                  <span class="font-mono text-slate-800">1.0.0</span>
+                  <span class="font-mono text-slate-800">0.0.1a</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-slate-600">Last Updated</span>
@@ -149,7 +149,7 @@
                 <div class="flex items-center justify-between" v-for="(feature, key) in configFeatures" :key="key">
                   <span class="text-slate-600">{{ key }}</span>
                   <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    :class="{'text-green-600': feature, 'text-red-600': !feature}">
                    {{ feature ? 'Enabled' : 'Disabled' }}
                 </span>
                 </div>
@@ -196,7 +196,7 @@
               <pre class="bg-slate-900 rounded-lg p-4 overflow-x-auto">
               <code class="text-sm font-mono text-slate-100">
 {
-  "version": "0.0.1",
+  "version": "0.0.1a",
   "features": {
     "translation": true,
     "crawlUrl": true,
@@ -302,7 +302,7 @@ const showFullConfig = () => {
 
 const copyToClipboard = () => {
   const json = `{
-  "version": "0.0.1",
+  "version": "0.0.1a",
   "features": {
     "translation": true,
     "crawlUrl": true,
