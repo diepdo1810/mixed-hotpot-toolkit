@@ -38,6 +38,13 @@ export async function getManifest(): Promise<Manifest.WebExtensionManifest> {
     content_security_policy: {}
   }
 
+  manifest.web_accessible_resources = [
+    {
+      resources: ['./fullscreen/index.html', 'fullscreen.js'],
+      matches: ['<all_urls>'],
+    },
+  ];
+
   if (IS_DEV) {
     // this is required on dev for Vite script to load
     manifest.content_security_policy = {
