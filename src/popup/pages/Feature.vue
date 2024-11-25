@@ -4,6 +4,7 @@ import { translate } from '~/logic/translate'
 import { fire } from '~/logic/firecrawl'
 import { summary } from '~/logic/summary'
 import { speech } from '~/logic/speech'
+import { useLocalStorage } from '@vueuse/core'
 
 const isLoaded = ref(false)
 const isDisabled = ref(false)
@@ -31,6 +32,7 @@ const voices = ref(
 const showToast = ref(false)
 const messToast = ref('')
 const isToastSuccess = ref(false)
+const storedResult = useLocalStorage('result', result, { listenToStorageChanges: true })
 
 watch(() => showToast.value, (value) => {
   if (value) {
@@ -38,6 +40,10 @@ watch(() => showToast.value, (value) => {
       showToast.value = false
     }, 1500)
   }
+})
+
+watch(result, (value) => {
+  storedResult.value = value
 })
 
 const translateData = async () => {
@@ -95,8 +101,14 @@ const toogleSpeech = () => {
   isCrawl.value = false
 }
 
-const toggleFullscreen = () => {
-  console.log('Toggle fullscreen')
+const openFullscreen = () => {
+  chrome.tabs.create({ url: './options/index.html' }, (tab) => {
+    if (chrome.runtime.lastError) {
+      console.error('Error creating tab:', chrome.runtime.lastError);
+      return;
+    }
+    console.log('Tab created with ID:', tab.id);
+  });
 }
 
 const handleCrawlSuccess = (message) => {
@@ -243,7 +255,7 @@ const speechData = async () => {
           <!-- Fullscreen -->
           <ActionButton
             iconPath="M13 1h5m0 0v5m0-5-5 5M1.979 6V1H7m0 16.042H1.979V12M18 12v5.042h-5M13 12l5 5M2 1l5 5m0 6-5 5"
-            @click="toggleFullscreen"
+            @click="openFullscreen"
             tooltipText="Fullscreen"
             viewBox="0 0 19 19"
           />
