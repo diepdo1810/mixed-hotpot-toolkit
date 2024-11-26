@@ -6,7 +6,6 @@ import { summary } from '~/logic/summary'
 import { speech } from '~/logic/speech'
 import { useLocalStorage } from '@vueuse/core'
 import { marked } from 'marked';
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 const isLoaded = ref(false)
 const isDisabled = ref(false)
