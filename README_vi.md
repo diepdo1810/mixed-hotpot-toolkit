@@ -58,4 +58,4 @@ Mixed Hotpot Toolkit là một công cụ **mã nguồn mở** tất cả trong 
 ---
 
 ## Tải xuống
-- [**📥 Tải xuống phiên bản mới nhất**](https://github.com/diepdo1810/mixed-hotpot-toolkit/releases/tag/0.0.1a)
+- [**📥 Tải xuống phiên bản mới nhất**](https://github.com/diepdo1810/mixed-hotpot-toolkit/releases/tag/0.0.2)
