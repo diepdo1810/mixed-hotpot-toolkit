@@ -20,13 +20,14 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 
   // eslint-disable-next-line no-console
   console.log('previous tab', tab)
-  sendMessage(
+  await sendMessage(
     'tab-prev',
     { title: tab.title },
     { context: 'content-script', tabId }
   )
 })
 
+// @ts-ignore
 onMessage('get-current-tab', async () => {
   try {
     const tab = await chrome.tabs.get(previousTabId)
