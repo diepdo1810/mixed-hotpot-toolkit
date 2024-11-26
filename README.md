@@ -56,5 +56,5 @@ Mixed Hotpot Toolkit is an **open-source** all-in-one tool designed to make your
 ---
 
 ## Download
-- [**📥 Download the Latest Version**](https://github.com/diepdo1810/mixed-hotpot-toolkit/releases/tag/0.0.1a)
+- [**📥 Download the Latest Version**](https://github.com/diepdo1810/mixed-hotpot-toolkit/releases/tag/0.0.2)
 
