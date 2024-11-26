@@ -67,9 +67,9 @@ export const summary = async (prompt: string, text: string, model: string) => {
           messages: [
             { role: 'user', content: prompt + '\n' + text }
           ],
-          temperature: 1.0,
-          top_p: 1.0,
-          max_tokens: 4000,
+          temperature: 0.7,
+          top_p: 0.9,
+          max_tokens: 8000,
           model: modelName
         }
       })
@@ -86,5 +86,7 @@ export const summary = async (prompt: string, text: string, model: string) => {
       console.error('Error with Azure API:', error)
       throw error
     }
+  } else {
+    throw 'Settings not found'
   }
 }

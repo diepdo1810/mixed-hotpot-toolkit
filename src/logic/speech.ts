@@ -33,7 +33,7 @@ export const speech = async (
       model: model,
       voice: voice,
       input: text,
-      speed: 1.5,
+      speed: 0.8,
     });
 
     // Convert response to base64 string
@@ -57,5 +57,8 @@ export const speech = async (
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
      */
+  } else {
+    console.error('Settings not found');
+    throw new Error('Settings not found');
   }
 }
