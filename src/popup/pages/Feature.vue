@@ -5,6 +5,8 @@ import { fire } from '~/logic/firecrawl'
 import { summary } from '~/logic/summary'
 import { speech } from '~/logic/speech'
 import { useLocalStorage } from '@vueuse/core'
+import { marked } from 'marked';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 const isLoaded = ref(false)
 const isDisabled = ref(false)
@@ -32,7 +34,8 @@ const voices = ref(
 const showToast = ref(false)
 const messToast = ref('')
 const isToastSuccess = ref(false)
-const storedResult = useLocalStorage('result', result, { listenToStorageChanges: true })
+useLocalStorage('result', result, { listenToStorageChanges: true })
+const convertedHtml = ref('')
 
 watch(() => showToast.value, (value) => {
   if (value) {
@@ -42,9 +45,7 @@ watch(() => showToast.value, (value) => {
   }
 })
 
-watch(result, (value) => {
-  storedResult.value = value
-})
+convertedHtml.value = marked(result.value)
 
 const translateData = async () => {
   isLoaded.value = true
@@ -157,7 +158,7 @@ const summaryData = async () => {
   isLoaded.value = true
   isDisabled.value = true
 
-  if (models.value.length === 0) {
+  if (models.value?.length === 0) {
     handleCrawlError('Please choose a model!');
     return;
   }
@@ -341,14 +342,28 @@ const speechData = async () => {
           </button>
         </div>
 
-        <!-- Textarea chính -->
+        <!-- Textarea main -->
         <textarea
           v-model="result"
           rows="8"
           class="mt-3 w-full p-3 border border-blue-100 rounded focus:ring-1 focus:ring-blue-500 transition-all bg-blue-50/50 text-gray-800 placeholder-gray-500 text-sm"
           placeholder="Enter text here ..."
           :disabled="isDisabled"
+          v-if="!convertedHtml"
         ></textarea>
+
+        <div
+          v-if="convertedHtml"
+          class="preview-container w-full h-96 p-4 border rounded-lg overflow-auto
+                   animate-fade-in dark:bg-gray-700 dark:text-gray-200"
+          v-html="convertedHtml"
+        ></div>
+
+        <!-- button clear -->
+        <button
+          @click="result = ''"
+          class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-all transform active:scale-95 text-sm mt-2"
+        > Clear </button>
 
         <!-- Audio Player -->
         <div v-if="audioSrc" class="mt-3 animate-bounce-in bg-orange-50 p-2 rounded">
