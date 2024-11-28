@@ -275,7 +275,7 @@ chrome.storage.sync.get(['settings'], (result) => {
 })
 
 const updateConfig = async () => {
-  const url = 'https://manguonmopodcast.b-cdn.net/setting.json'
+  const url = 'https://api.npoint.io/85a4658254b4c9a9afab'
   try {
     const response = await fetch(url)
     const data = await response.json()
