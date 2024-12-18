@@ -1,11 +1,12 @@
 <script setup>
 import { ref } from 'vue'
-import { translate } from '~/logic/translate'
 import { fire } from '~/logic/firecrawl'
 import { summary } from '~/logic/summary'
 import { speech } from '~/logic/speech'
 import { useLocalStorage } from '@vueuse/core'
 import { marked } from 'marked';
+import { translate } from '~/logic/aryahcr'
+
 
 const isLoaded = ref(false)
 const isDisabled = ref(false)
@@ -73,8 +74,8 @@ const translateData = async () => {
 
   for (const item of texts) {
     try {
-      const res = await translate(item, 'en', 'vi', 'text', 50)
-      translatedText += res.translatedText + '\n\n'
+      const res = await translate(item, 'en', 'vi')
+      translatedText += res.translate.result + '\n\n'
       result.value = translatedText
       handleCrawlSuccess('Translate text successfully')
     } catch (error) {
