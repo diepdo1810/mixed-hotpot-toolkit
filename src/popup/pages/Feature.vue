@@ -102,13 +102,29 @@ const toogleSpeech = () => {
   isCrawl.value = false
 }
 
+const usedNumbers = new Set();
+
+const getUniqueRandomNumber = (max = 1000) => {
+  let randomNumber;
+  do {
+    randomNumber = Math.floor(Math.random() * max);
+  } while (usedNumbers.has(randomNumber));
+  usedNumbers.add(randomNumber);
+  return randomNumber;
+}
+
 const openFullscreen = () => {
-  chrome.tabs.create({ url: './options/index.html' }, (tab) => {
+  const random = getUniqueRandomNumber();
+  chrome.tabs.create({ url: `./options/index.html?tabId=${random}` }, (tab) => {
     if (chrome.runtime.lastError) {
       console.error('Error creating tab:', chrome.runtime.lastError);
       return;
     }
     console.log('Tab created with ID:', tab.id);
+    useLocalStorage('tabId', tab.id);
+    // add tabId on url
+    const url = chrome.runtime.getURL(`options/index.html?tabId=${tab.id}`);
+    chrome.tabs.update(tab.id, { url });
   });
 }
 
