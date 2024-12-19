@@ -31,11 +31,38 @@ const voice = ref('namminh')
 const voices = ref(
   ['henry', 'bwyneth', 'snoop', 'mrbeast', 'gwyneth', 'cliff', 'guy', 'jane', 'matthew', 'benwilson', 'henry', 'bwyneth', 'snoop', 'mrbeast', 'gwyneth', 'benwilson', 'cliff', 'presidential', 'guy', 'jane', 'matthew', 'carly', 'kyle', 'kristy', 'oliver', 'tasha', 'joe', 'lisa', 'george', 'emily', 'rob', 'russell', 'benjamin', 'jenny', 'aria', 'joanna', 'nate', 'mary', 'salli', 'joey', 'ryan', 'sonia', 'oliver', 'amy', 'michael', 'thomas', 'libby', 'narrator', 'brian', 'natasha', 'william', 'freya', 'ken', 'olivia', 'aditi', 'abeo', 'ezinne', 'luke', 'leah', 'willem', 'adri', 'fatima', 'hamdan', 'hala', 'rana', 'bassel', 'bashkar', 'tanishaa', 'kalina', 'borislav', 'joana', 'enric', 'xiaoxiao', 'yunfeng', 'xiaomeng', 'yunjian', 'xiaoyan', 'yunze', 'zhiyu', 'hiumaan', 'wanlung', 'hiujin', 'hsiaochen', 'hsiaoyu', 'yunjhe', 'srecko', 'gabrijela', 'antonin', 'vlasta', 'christel', 'jeppe', 'colette', 'maarten', 'laura', 'ruben', 'dena', 'arnaud', 'anu', 'kert', 'blessica', 'angelo', 'harri', 'selma', 'denise', 'henri', 'celeste', 'claude', 'sylvie', 'jean', 'charline', 'gerard', 'ariane', 'fabrice', 'katja', 'christoph', 'louisa', 'conrad', 'vicki', 'daniel', 'giorgi', 'eka', 'athina', 'nestoras', 'avri', 'hila', 'madhur', 'swara', 'noemi', 'tamas', 'gudrun', 'gunnar', 'gadis', 'ardi', 'irma', 'benigno', 'elsa', 'gianni', 'palmira', 'diego', 'imelda', 'cataldo', 'bianca', 'adriano', 'mayu', 'naoki', 'nanami', 'daichi', 'shiori', 'keita', 'daulet', 'aigul', 'sunhi', 'injoon', 'jimin', 'bongjin', 'seoyeon', 'ona', 'leonas', 'everita', 'nils', 'osman', 'yasmin', 'sagar', 'hemkala', 'iselin', 'finn', 'pernille', 'farid', 'dilara', 'agnieszka', 'marek', 'zofia', 'brenda', 'donato', 'yara', 'fabio', 'leila', 'julio', 'camila', 'thiago', 'fernanda', 'duarte', 'ines', 'cristiano', 'alina', 'emil', 'dariya', 'dmitry', 'tatyana', 'maxim', 'viktoria', 'lukas', 'petra', 'rok', 'sameera', 'thilini', 'saul', 'vera', 'arnau', 'triana', 'gerardo', 'carlota', 'luciano', 'larissa', 'lupe', 'hillevi', 'mattias', 'sofie', 'rehema', 'daudi', 'pallavi', 'valluvar', 'saranya', 'kumar', 'kani', 'surya', 'venba', 'anbu', 'mohan', 'shruti', 'premwadee', 'niwat', 'emel', 'ahmet', 'gul', 'salman', 'uzma', 'asad', 'polina', 'ostap', 'hoaimy', 'namminh', 'orla', 'colm']
 )
+const fillCrawl = ref('')
+
+const fillCrawls = ref([
+  {
+    name: 'dantri.com.vn',
+    incl: '.singular-container'
+  },
+  {
+    name: 'www.indiehackers.com',
+    incl: '.post-page__content'
+  }
+])
+
 const showToast = ref(false)
 const messToast = ref('')
 const isToastSuccess = ref(false)
 useLocalStorage('result', result, { listenToStorageChanges: true })
 const convertedHtml = ref('')
+
+watch(() => url.value, (value) => {
+  if (value) {
+    // example value: https://www.indiehackers.com/post/40-open-source-gems-to-replace-your-saas-subscriptions-f733b8e166
+
+    const url = new URL(value)
+    const hostname = url.hostname
+
+    const fill = fillCrawls.value.find((item) => item.name === hostname)
+
+    fillCrawl.value = fill?.name || ''
+    include.value = fill?.incl || ''
+  }
+})
 
 watch(() => showToast.value, (value) => {
   if (value) {
@@ -290,6 +317,16 @@ const speechData = async () => {
             placeholder="enter url (ex: https://firecrawl.dev)"
             class="w-full p-2 border border-green-200 rounded focus:ring-1 focus:ring-green-500 text-sm"
           />
+          <div class="grid hidden">
+            <select
+              v-model="fillCrawl"
+              class="w-full p-2 border border-green-200 rounded focus:ring-1 focus:ring-green-500 text-sm"
+            >
+              <option v-for="item in fillCrawls" :key="item.name" :value="item.incl">
+                {{ item.name }}
+              </option>
+            </select>
+          </div>
           <div class="grid grid-cols-2 gap-2">
             <input
               v-model="include"
