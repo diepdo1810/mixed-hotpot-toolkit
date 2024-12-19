@@ -144,9 +144,10 @@ export const agent = async (
         if (!chat) chat = {};
         if (result.finish) {
           console.log('Stream finished:', result);
+
           return result;
         } else {
-          console.log('Streaming:', result);
+          chat = { ...chat, ...result };
         }
       }
     }

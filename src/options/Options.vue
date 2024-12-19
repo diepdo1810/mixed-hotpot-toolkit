@@ -78,7 +78,7 @@ const newMessage = ref('')
 const keys = computed(() => extractKeywords(keywordData.value))
 const keywordData = ref('')
 
-const sendMessage = () => {
+const sendMessage = async () => {
   if (newMessage.value.trim() === '') return
 
   // Add user message
@@ -87,13 +87,20 @@ const sendMessage = () => {
     text: newMessage.value
   })
 
-  // Simulate bot response
-  setTimeout(() => {
+  const rs = await agent([{
+    "role": "user",
+    "content": newMessage.value + ' trong tài liệu \n' + result.value
+  }], true, true);
+
+
+  console.log(rs);
+
+  if (rs.message) {
     messages.value.push({
-      sender: 'system',
-      text: 'Tôi đã nhận được tin nhắn của bạn!'
-    })
-  }, 500)
+      sender: 'bot',
+      text: rs.message
+    });
+  }
 
   // Clear input
   newMessage.value = ''
@@ -114,14 +121,13 @@ const handleKeywordClick = async (key) => {
       "content": `Hãy cho tôi biết thông tin về từ khóa "${key}" trong tài liệu \n ${result.value}.`
     }], true, true);
 
-    console.log(rs);
 
-    // if (rs.message) {
-    //   messages.value.push({
-    //     sender: 'system',
-    //     text: rs.message
-    //   });
-    // }
+    if (rs.message) {
+      messages.value.push({
+        sender: 'bot',
+        text: rs.message
+      });
+    }
   } catch (error) {
     console.error('Error fetching information for keyword:', error);
     messages.value.push({
