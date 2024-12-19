@@ -66,8 +66,8 @@
 import { useLocalStorage } from '@vueuse/core'
 import { onMounted, ref } from 'vue'
 import { marked } from 'marked'
-import { keyword } from '~/logic/keyword'
-import { agent } from '~/logic/aryahcr'
+// import { keyword } from '~/logic/keyword'
+import { agent, keyword } from '~/logic/aryahcr'
 
 const result = ref('')
 const convertedHtml = ref('')
@@ -146,6 +146,8 @@ const extractKeywords = (text) => {
   const keywordLines = lines.filter(line => line.includes('<code>'));
 
   return keywordLines.map(line => {
+    // remote <p> tag
+    line = line.replace(/<\/?p>/g, '');
     const cleanedLine = line.replace(/<\/?code>/g, '');
     return cleanedLine.trim();
   });
@@ -155,9 +157,13 @@ const extractKeywords = (text) => {
 const getKeywords = async () => {
   // get tabId in url
   const tabId = new URLSearchParams(window.location.search).get('tabId');
-  const keywordRs= useLocalStorage(`data-${tabId}`, keywordData);
+  const keywordRs = useLocalStorage(`data-${tabId}`, keywordData);
   if (!keywordRs.value) {
-    keywordData.value = await keyword('claude-3-haiku', result.value)
+    keywordData.value = await keyword(`
+          Find unique shorthand keywords in the following text, and display them in the format <code>keyword</code>:
+          ${result.value}
+
+`, true)
     useLocalStorage(`data-${tabId}`, keywordData.value);
   }
 

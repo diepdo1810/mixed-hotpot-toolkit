@@ -10,6 +10,58 @@ export const getSettings = (): Promise<Settings> => {
   })
 }
 
+/** TODO
+export const fetchPostData = async (url?: string, payload?: any, isTrans?: boolean, urlCustom?: string) => {
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) throw new Error(`Error: ${response.statusText}`)
+
+    await handleEvents(url, response, isTrans, urlCustom)
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
+export const handleEvents = async (url?: string, response?: Response, isTrans?: boolean, urlCustom?: string) => {
+  const postData = await response.json()
+
+  let id = postData.id
+  let data = true
+  let responseData = null
+  let ur = ''
+
+  while (data) {
+    await new Promise(r => setTimeout(r, 1000))
+
+    ur = isTrans ? url : urlCustom
+
+    const getResponse = await fetch(`${ur}/${encodeURIComponent(id)}`)
+
+    if (!getResponse.ok) throw new Error(`Error: ${getResponse.statusText}`)
+    responseData = await getResponse.json()
+
+    console.log(responseData)
+
+    switch (responseData.status) {
+      case 'pending':
+        data = true
+        break
+      case 'error':
+      case 'completed':
+      case 'not_found':
+        data = false
+        break
+    }
+  }
+
+  return responseData
+} **/
+
 export const translate = async (
   text: string,
   source: string,
@@ -70,6 +122,53 @@ export const translate = async (
   }
 }
 
+export const keyword = async (
+  prompt: string,
+  markdown: boolean = false,
+) => {
+  try {
+    const postResponse = await fetch('https://nexra.aryahcr.cc/api/chat/gptweb', {
+      method: 'POST',
+      body: JSON.stringify({
+        prompt: prompt,
+        markdown: markdown,
+      }),
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+    if (!postResponse.ok) throw new Error(`Error: ${postResponse.statusText}`)
+    const postData = await postResponse.json()
+
+    let id = postData.id
+    let data = true
+    let responseData = null
+
+    while (data) {
+      await new Promise(r => setTimeout(r, 1000))
+
+      const getResponse = await fetch(`https://nexra.aryahcr.cc/api/chat/task/${encodeURIComponent(id)}`)
+
+      if (!getResponse.ok) throw new Error(`Error: ${getResponse.statusText}`)
+      responseData = await getResponse.json()
+
+      switch (responseData.status) {
+        case 'pending':
+          data = true
+          break
+        case 'error':
+        case 'completed':
+        case 'not_found':
+          data = false
+          break
+      }
+    }
+
+    return responseData.gpt
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 interface Payload {
   messages?: string[];
   stream?: boolean;
@@ -92,9 +191,6 @@ export const agent = async (
   };
 
   const fetchStreamData = async (url: string, payload: any, headers: HeadersInit) => {
-    console.log('Payload:', payload);
-    console.log('Headers:', headers);
-    console.log('URL:', url);
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -155,24 +251,18 @@ export const agent = async (
     return { code: 500, status: false, message: 'INTERNAL_SERVER_ERROR' };
   }
 
-  const settings: Settings = await getSettings()
+  try {
+    const headers = { 'Content-Type': 'application/json' };
 
-  if (settings) {
-    const api = settings.aryahcr
+    const payload = {
+      messages: messages,
+      stream: stream,
+      markdown: markdown,
+      model: model,
+    };
 
-    try {
-      const headers = { 'Content-Type': 'application/json' };
-
-      const payload = {
-        messages: messages,
-        stream: stream,
-        markdown: markdown,
-        model: model,
-      };
-
-      return fetchStreamData('https://nexra.aryahcr.cc/api/chat/complements', payload, headers);
-    } catch (error) {
-      console.error(error);
-    }
+    return fetchStreamData('https://nexra.aryahcr.cc/api/chat/complements', payload, headers);
+  } catch (error) {
+    console.error(error);
   }
 }
