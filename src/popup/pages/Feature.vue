@@ -7,7 +7,6 @@ import { useLocalStorage } from '@vueuse/core'
 import { marked } from 'marked';
 import { translate } from '~/logic/aryahcr'
 
-
 const isLoaded = ref(false)
 const isDisabled = ref(false)
 const result = ref('')
@@ -47,6 +46,7 @@ const fillCrawls = ref([
 const showToast = ref(false)
 const messToast = ref('')
 const isToastSuccess = ref(false)
+
 useLocalStorage('result', result, { listenToStorageChanges: true })
 const convertedHtml = ref('')
 
@@ -87,27 +87,13 @@ const translateData = async () => {
   }
 
   const text = result.value
-  let texts = text.split('\n')
 
-  if (texts.length === 0) {
-    handleCrawlError('Please enter the text!')
-    return
-  }
-
-  texts = texts.filter((item) => item.trim() !== '')
-  texts = texts.map((item) => item.replace(/\(https?:\/\/.*\)/g, ''))
-
-  let translatedText = ''
-
-  for (const item of texts) {
-    try {
-      const res = await translate(item, 'en', 'vi')
-      translatedText += res.translate.result + '\n\n'
-      result.value = translatedText
-      handleCrawlSuccess('Translate text successfully')
-    } catch (error) {
-      handleCrawlError('Please check Settings to see if updates have been applied.')
-    }
+  try {
+    const res = await translate(text, 'en', 'vi')
+    result.value = res.translate.result
+    handleCrawlSuccess('Translate text successfully')
+  } catch (error) {
+    handleCrawlError('Please check Settings to see if updates have been applied.')
   }
 }
 

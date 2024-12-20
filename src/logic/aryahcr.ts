@@ -10,8 +10,7 @@ export const getSettings = (): Promise<Settings> => {
   })
 }
 
-/** TODO
-export const fetchPostData = async (url?: string, payload?: any, isTrans?: boolean, urlCustom?: string) => {
+export const fetchPostData = async (url?: string, payload?: any, urlId?: string) => {
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -21,26 +20,25 @@ export const fetchPostData = async (url?: string, payload?: any, isTrans?: boole
 
     if (!response.ok) throw new Error(`Error: ${response.statusText}`)
 
-    await handleEvents(url, response, isTrans, urlCustom)
+    return await handleEvents(url, response, urlId)
   } catch (error) {
     console.error('Error:', error)
   }
 }
 
-export const handleEvents = async (url?: string, response?: Response, isTrans?: boolean, urlCustom?: string) => {
+export const handleEvents = async (url?: string, response?: Response, urlId?: string) => {
   const postData = await response.json()
 
   let id = postData.id
   let data = true
   let responseData = null
-  let ur = ''
 
   while (data) {
     await new Promise(r => setTimeout(r, 1000))
 
-    ur = isTrans ? url : urlCustom
+    console.log(urlId ? 'have urlId true' : 'have urlId false')
 
-    const getResponse = await fetch(`${ur}/${encodeURIComponent(id)}`)
+    const getResponse = await fetch(`${urlId ?? url}/${encodeURIComponent(id)}`)
 
     if (!getResponse.ok) throw new Error(`Error: ${getResponse.statusText}`)
     responseData = await getResponse.json()
@@ -60,65 +58,28 @@ export const handleEvents = async (url?: string, response?: Response, isTrans?: 
   }
 
   return responseData
-} **/
+}
 
 export const translate = async (
   text: string,
   source: string,
   target: string
 ) => {
+  console.log(text, source, target)
 
   const settings: Settings = await getSettings()
+  console.log(settings)
 
   if (settings) {
     const api = settings.aryahcr
 
-    console.log(api)
-    try {
-      const postResponse = await fetch(api, {
-        method: 'POST',
-        body: JSON.stringify({
-          text: text,
-          source: source,
-          target: target
-        }),
-        headers: { 'Content-Type': 'application/json' }
-      })
-
-      if (!postResponse.ok) throw new Error(`Error: ${postResponse.statusText}`)
-
-      const postData = await postResponse.json()
-
-      let id = postData.id
-      let data = true
-      let responseData = null
-
-      while (data) {
-        await new Promise(r => setTimeout(r, 1000))
-
-        const getResponse = await fetch(`${api}/${encodeURIComponent(id)}`)
-
-        if (!getResponse.ok) throw new Error(`Error: ${getResponse.statusText}`)
-        responseData = await getResponse.json()
-
-        console.log(responseData)
-
-        switch (responseData.status) {
-          case 'pending':
-            data = true
-            break
-          case 'error':
-          case 'completed':
-          case 'not_found':
-            data = false
-            break
-        }
-      }
-
-      return responseData
-    } catch (error) {
-      console.error(error)
+    const payload = {
+      text: text,
+      source: source,
+      target: target,
     }
+
+    return await fetchPostData(api, payload)
   }
 }
 
@@ -126,47 +87,12 @@ export const keyword = async (
   prompt: string,
   markdown: boolean = false,
 ) => {
-  try {
-    const postResponse = await fetch('https://nexra.aryahcr.cc/api/chat/gptweb', {
-      method: 'POST',
-      body: JSON.stringify({
-        prompt: prompt,
-        markdown: markdown,
-      }),
-      headers: { 'Content-Type': 'application/json' }
-    })
+  const url = 'https://nexra.aryahcr.cc/api/chat/gptweb'
+  const urlId = 'https://nexra.aryahcr.cc/api/chat/task'
 
-    if (!postResponse.ok) throw new Error(`Error: ${postResponse.statusText}`)
-    const postData = await postResponse.json()
+  const response = await fetchPostData(url, { prompt, markdown }, urlId)
 
-    let id = postData.id
-    let data = true
-    let responseData = null
-
-    while (data) {
-      await new Promise(r => setTimeout(r, 1000))
-
-      const getResponse = await fetch(`https://nexra.aryahcr.cc/api/chat/task/${encodeURIComponent(id)}`)
-
-      if (!getResponse.ok) throw new Error(`Error: ${getResponse.statusText}`)
-      responseData = await getResponse.json()
-
-      switch (responseData.status) {
-        case 'pending':
-          data = true
-          break
-        case 'error':
-        case 'completed':
-        case 'not_found':
-          data = false
-          break
-      }
-    }
-
-    return responseData.gpt
-  } catch (error) {
-    console.error(error)
-  }
+  return response.gpt
 }
 
 interface Payload {

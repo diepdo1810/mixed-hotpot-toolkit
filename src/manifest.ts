@@ -41,7 +41,7 @@ export async function getManifest(): Promise<Manifest.WebExtensionManifest> {
   if (IS_DEV) {
     // this is required on dev for Vite script to load
     manifest.content_security_policy = {
-      extension_pages: `script-src 'self' http://localhost:${PORT}; object-src 'self'`
+      extension_pages: `script-src 'wasm-unsafe-eval' http://localhost:${PORT}; object-src 'self'`
     }
   }
 

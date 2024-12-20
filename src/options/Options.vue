@@ -66,7 +66,6 @@
 import { useLocalStorage } from '@vueuse/core'
 import { onMounted, ref } from 'vue'
 import { marked } from 'marked'
-// import { keyword } from '~/logic/keyword'
 import { agent, keyword } from '~/logic/aryahcr'
 
 const result = ref('')
@@ -91,9 +90,6 @@ const sendMessage = async () => {
     "role": "user",
     "content": newMessage.value + ' trong tài liệu \n' + result.value
   }], true, true);
-
-
-  console.log(rs);
 
   if (rs.message) {
     messages.value.push({
@@ -152,7 +148,6 @@ const extractKeywords = (text) => {
     return cleanedLine.trim();
   });
 }
-
 
 const getKeywords = async () => {
   // get tabId in url
