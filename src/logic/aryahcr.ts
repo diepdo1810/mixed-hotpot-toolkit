@@ -85,14 +85,29 @@ export const translate = async (
 
 export const keyword = async (
   prompt: string,
-  markdown: boolean = false,
+  model: string = 'openai',
 ) => {
-  const url = 'https://nexra.aryahcr.cc/api/chat/gptweb'
-  const urlId = 'https://nexra.aryahcr.cc/api/chat/task'
+  const url = 'https://text.pollinations.ai/'
+  const body = {
+    messages: [
+      {
+        role: 'user',
+        content: prompt,
+      }
+    ],
+    seed: 42,
+    model: model,
+  }
 
-  const response = await fetchPostData(url, { prompt, markdown }, urlId)
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
 
-  return response.gpt
+  if (!response.ok) throw new Error(`Error: ${response.statusText}`)
+
+  return await response.text()
 }
 
 interface Payload {

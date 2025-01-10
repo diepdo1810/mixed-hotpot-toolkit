@@ -1,53 +1,154 @@
 <template>
-  <div class="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900 p-6" v-if="convertedHtml">
+  <div class="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-6" v-if="convertedHtml">
     <div class="flex w-full max-w-4xl space-x-8">
-      <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full">
-        <h1 class="text-4xl font-bold mb-6 animate-fade-in">Full screen</h1>
-        <div class="text-gray-700 dark:text-gray-200 text-left leading-relaxed space-y-4 animate-slide-up" v-html="convertedHtml"></div>
-      </div>
-      <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full h-96 flex flex-col">
-        <h2 class="text-lg font-semibold mb-4 animate-bounce">Agent</h2>
-        <div class="flex-1 overflow-y-auto mb-4 space-y-3">
-          <div
-            v-for="(message, index) in messages"
-            :key="index"
-            class="flex"
-            :class="message.sender === 'user' ? 'justify-end' : 'justify-start'"
+      <!-- Left Panel -->
+      <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 w-full backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95
+                  transform hover:scale-[1.02] transition-all duration-300">
+        <div class="flex justify-between items-center">
+          <h1 class="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500 animate-fade-in">
+            Full screen
+          </h1>
+          <button
+            @click="speechData"
+            :disabled="isDisabled"
+            class="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700
+           text-white px-4 py-3 rounded-xl mr-2
+           shadow-lg hover:shadow-xl
+           transform hover:-translate-y-0.5 active:translate-y-0
+           transition-all duration-150 ease-in-out
+           flex items-center justify-center relative
+           disabled:opacity-50 disabled:cursor-not-allowed"
+            :class="{ 'from-green-600 to-green-700': isSpeech }"
           >
-            <div
-              class="max-w-[75%] p-3 rounded-lg text-sm animate-slide-in"
-              :class="message.sender === 'user'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'">
+            <!-- Loading Spinner -->
+            <div v-if="isLoaded && !isSpeech"
+                 class="absolute inset-0 flex items-center justify-center">
+              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            </div>
 
-              <div v-html="message.text"></div>
+            <!-- Speaking Animation -->
+            <div v-if="isSpeech" class="absolute inset-0 rounded-xl">
+              <div class="absolute inset-0 rounded-xl animate-ping bg-green-400 opacity-20"></div>
+              <div class="absolute inset-0 rounded-xl animate-pulse bg-green-400 opacity-10"></div>
+            </div>
 
+            <!-- Speaker Icon -->
+            <svg
+              v-show="!isLoaded || isSpeech"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 transition-transform duration-150"
+              :class="{ 'animate-pulse': isSpeech }"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+              />
+            </svg>
+          </button>
 
-              <div class="flex flex-wrap gap-2 justify-start mt-2" v-if="keys.length > 0
-              && message.sender === 'assistant' && message.isFirst">
-                <span
-                  v-for="(keyword, index) in keys"
-                  :key="index"
-                  class="bg-blue-50 text-blue-500 font-medium px-3 py-1 rounded-md hover:bg-blue-100 transition-colors duration-200 cursor-pointer"
+          <!-- Hidden audio element -->
+          <audio
+            ref="audioPlayer"
+            class="hidden"
+            @ended="handleAudioEnded"
+            @error="handleAudioError"
+          ></audio>
+          <button
+            @click="translateMessage"
+            class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl
+                   shadow-lg hover:shadow-xl
+                   transform hover:-translate-y-0.5 active:translate-y-0
+                   transition-all duration-150 ease-in-out
+                   flex items-center gap-3"
+          >
+            <svg
+              class="w-6 h-6 transform group-hover:rotate-12 transition-transform duration-150"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M5 8L10 13M4 14L10 8L12 5M2 5H14M7 2H8M12.913 17H20.087M12.913 17L11 21M12.913 17L15.7783 11.009C16.0092 10.5263 16.1246 10.2849 16.2826 10.2086C16.4199 10.1423 16.5801 10.1423 16.7174 10.2086C16.8754 10.2849 16.9908 10.5263 17.2217 11.009L20.087 17M20.087 17L22 21"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+              />
+            </svg>
+            <span class="group-hover:translate-x-0.5 transition-transform duration-150">Translate</span>
+          </button>
+        </div>
+
+        <div class="prose prose-lg dark:prose-invert max-w-none animate-slide-up" v-html="convertedHtml"></div>
+      </div>
+
+      <!-- Right Panel -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full h-[600px] flex flex-col
+                  backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Agent</h2>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600 dark:text-blue-400 text-sm font-medium">
+              Keywords: {{keys.length}}
+            </span>
+          </div>
+        </div>
+
+        <!-- Keywords section with improved styling -->
+        <div class="bg-gray-50/50 dark:bg-gray-700/30 rounded-xl p-4 mb-6 backdrop-blur-sm">
+          <div class="flex flex-wrap gap-2">
+            <span v-for="keyword in keys"
+                  :key="keyword"
                   @click="handleKeywordClick(keyword)"
-                >
-                  {{ keyword }}
-                </span>
-              </div>
+                  class="inline-flex items-center px-4 py-2 rounded-lg
+                         text-sm font-medium bg-white dark:bg-gray-800
+                         text-blue-600 dark:text-blue-400
+                         shadow-sm hover:shadow-md
+                         hover:bg-blue-50 dark:hover:bg-gray-700
+                         transition-all duration-200 cursor-pointer
+                         transform hover:scale-105 hover:-translate-y-0.5">
+              {{ keyword }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Messages section with improved scrollbar -->
+        <div class="flex-1 overflow-y-auto space-y-4 mb-6 pr-4
+                    scrollbar-thin scrollbar-thumb-blue-500/20 hover:scrollbar-thumb-blue-500/40
+                    scrollbar-track-transparent">
+          <div v-for="(message, index) in messages"
+               :key="index"
+               class="flex animate-fade-in"
+               :class="message?.sender === 'user' ? 'justify-end' : 'justify-start'">
+            <div class="max-w-[80%] p-4 rounded-2xl shadow-lg backdrop-blur-sm"
+                 :class="message?.sender === 'user'
+                   ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                   : 'bg-gray-50/90 dark:bg-gray-700/90 text-gray-800 dark:text-gray-200'">
+              <div v-html="message.text" class="prose dark:prose-invert max-w-none"></div>
             </div>
           </div>
         </div>
-        <div class="flex space-x-2 animate-slide-up">
-          <input
-            v-model="newMessage"
-            @keyup.enter="sendMessage"
-            placeholder="enter your message..."
-            class="flex-grow p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            @click="sendMessage"
-            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-          >
+
+        <!-- Input section with improved styling -->
+        <div class="flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-gray-700/30 rounded-xl backdrop-blur-sm">
+          <input v-model="newMessage"
+                 @keyup.enter="sendMessage"
+                 placeholder="Enter your message..."
+                 class="flex-1 px-4 py-3 rounded-xl bg-white/50 dark:bg-gray-800/50
+                        border-0 focus:ring-2 focus:ring-blue-500/50
+                        text-gray-800 dark:text-gray-200
+                        placeholder-gray-400 dark:placeholder-gray-500
+                        transition-all duration-200" />
+          <button @click="sendMessage"
+                  class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600
+                         hover:from-blue-600 hover:to-blue-700
+                         text-white font-medium shadow-lg shadow-blue-500/25
+                         transform hover:-translate-y-0.5 active:translate-y-0
+                         transition-all duration-150">
             Send
           </button>
         </div>
@@ -55,9 +156,16 @@
     </div>
   </div>
 
-  <div v-else>
-    <div class="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
-      <code class="text-gray-700 dark:text-gray-200 text-lg">40404</code>
+  <div v-else class="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-6">
+    <div class="animate-pulse flex space-x-4">
+      <div class="rounded-full bg-blue-400 h-12 w-12"></div>
+      <div class="flex-1 space-y-4 py-1">
+        <div class="h-4 bg-blue-400 rounded w-3/4"></div>
+        <div class="space-y-2">
+          <div class="h-4 bg-blue-400 rounded"></div>
+          <div class="h-4 bg-blue-400 rounded w-5/6"></div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -66,7 +174,8 @@
 import { useLocalStorage } from '@vueuse/core'
 import { onMounted, ref } from 'vue'
 import { marked } from 'marked'
-import { agent, keyword } from '~/logic/aryahcr'
+import { agent, keyword, translate } from '~/logic/aryahcr'
+import { speech } from '~/logic/speech'
 
 const result = ref('')
 const convertedHtml = ref('')
@@ -76,6 +185,18 @@ const newMessage = ref('')
 
 const keys = computed(() => extractKeywords(keywordData.value))
 const keywordData = ref('')
+
+// voice
+const audioPlayer = ref<HTMLAudioElement | null>(null)
+const isLoaded = ref(false)
+const isDisabled = ref(false)
+const isSpeech = ref(false)
+
+const handleAudioEnded = () => {
+  isSpeech.value = false
+  isDisabled.value = false
+  isLoaded.value = false
+}
 
 const sendMessage = async () => {
   if (newMessage.value.trim() === '') return
@@ -91,20 +212,16 @@ const sendMessage = async () => {
     "content": newMessage.value + ' trong tài liệu \n' + result.value
   }], true, true);
 
-  if (rs.message) {
-    messages.value.push({
-      sender: 'bot',
-      text: rs.message
-    });
-  }
+  messages.value.push({
+    sender: 'bot',
+    text: rs.message || 'Có lỗi xảy ra khi xử lý yêu cầu của bạn.'
+  });
 
   // Clear input
   newMessage.value = ''
 }
 
 const handleKeywordClick = async (key) => {
-  console.log(key);
-
   // Add user message
   messages.value.push({
     sender: 'user',
@@ -158,11 +275,88 @@ const getKeywords = async () => {
           Find unique shorthand keywords in the following text, and display them in the format <code>keyword</code>:
           ${result.value}
 
-`, true)
+`)
+
     useLocalStorage(`data-${tabId}`, keywordData.value);
   }
 
   return keys.value
+}
+
+const translateMessage = async () => {
+  const text = convertedHtml.value;
+
+  try {
+    const res = await translate(text, 'en', 'vi');
+    convertedHtml.value = res.translate.result;
+
+    const tabId = new URLSearchParams(window.location.search).get('tabId');
+    // save to local storage
+    useLocalStorage(`result-vn-${tabId}`, <string>marked(convertedHtml.value));
+  } catch (error) {
+    console.error('Error translating message:', error);
+  }
+}
+
+const speechData = async () => {
+  try {
+    const tabId = new URLSearchParams(window.location.search).get('tabId');
+    const getStoreValue = useLocalStorage(`result-vn-${tabId}`);
+
+    const audioSourceStore = await useLocalStorage(`audio-${tabId}`);
+
+    if (audioSourceStore.value) {
+      audioPlayer.value.src = audioSourceStore.value;
+
+      const playPromise = audioPlayer.value.play()
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            isSpeech.value = true
+            isLoaded.value = false
+          })
+          .catch(error => {
+            console.error('Auto-play failed:', error)
+            isDisabled.value = false
+            isLoaded.value = false
+          })
+      }
+      return
+    }
+
+    const audioSource = await speech(getStoreValue.value.replace(/<\/?[^>]+(>|$)/g, ''), 'shimmer', 'tts-1');
+
+    // save to local storage
+    useLocalStorage(`audio-${tabId}`, audioSource);
+
+    if (audioPlayer.value) {
+      const audioSourceStore = await useLocalStorage(`audio-${tabId}`);
+      console.log("audioSourceStore", audioSourceStore.value);
+
+      audioPlayer.value.src = audioSourceStore.value ?? audioSource;
+
+      const playPromise = audioPlayer.value.play()
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            isSpeech.value = true
+            isLoaded.value = false
+          })
+          .catch(error => {
+            console.error('Auto-play failed:', error)
+            isDisabled.value = false
+            isLoaded.value = false
+          })
+      }
+    } else {
+      isDisabled.value = false
+      isLoaded.value = false
+    }
+  } catch (error) {
+    console.error('Error speaking text:', error);
+  }
 }
 
 onMounted(async () => {
@@ -178,13 +372,18 @@ onMounted(async () => {
     isFirst: true
   })
 
+  if (audioPlayer.value) {
+    audioPlayer.value.pause()
+    audioPlayer.value.src = ''
+  }
 })
 </script>
 
+
 <style scoped>
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slide-up {
@@ -193,10 +392,32 @@ onMounted(async () => {
 }
 
 .animate-fade-in {
-  animation: fade-in 1.2s ease-out;
+  animation: fade-in 0.6s ease-out forwards;
 }
 
 .animate-slide-up {
-  animation: slide-up 0.8s ease-out;
+  animation: slide-up 0.8s ease-out forwards;
+}
+
+/* Custom scrollbar styling */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(59, 130, 246, 0.2);
+  border-radius: 20px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(59, 130, 246, 0.4);
 }
 </style>

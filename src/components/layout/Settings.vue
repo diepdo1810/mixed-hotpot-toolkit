@@ -131,7 +131,7 @@
               <div class="bg-slate-50 rounded-lg p-4 space-y-3">
                 <div class="flex items-center justify-between">
                   <span class="text-slate-600">Version</span>
-                  <span class="font-mono text-slate-800">0.0.2</span>
+                  <span class="font-mono text-slate-800">0.0.3</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-slate-600">Last Updated</span>
@@ -196,7 +196,7 @@
               <pre class="bg-slate-900 rounded-lg p-4 overflow-x-auto">
               <code class="text-sm font-mono text-slate-100">
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "features": {
     "translation": true,
     "crawlUrl": true,
@@ -302,7 +302,7 @@ const showFullConfig = () => {
 
 const copyToClipboard = () => {
   const json = `{
-  "version": "0.0.2",
+  "version": "0.0.3",
   "features": {
     "translation": true,
     "crawlUrl": true,
