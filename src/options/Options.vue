@@ -21,8 +21,45 @@
                disabled:opacity-50 disabled:cursor-not-allowed"
               :class="{ 'from-green-600 to-green-700': isSpeech }"
             >
-              <!-- Button content remains the same -->
+              <!-- Loading Spinner -->
+              <div v-if="isLoaded && !isSpeech"
+                   class="absolute inset-0 flex items-center justify-center">
+                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              </div>
+
+              <!-- Speaking Animation -->
+              <div v-if="isSpeech" class="absolute inset-0 rounded-xl">
+                <div class="absolute inset-0 rounded-xl animate-ping bg-green-400 opacity-20"></div>
+                <div class="absolute inset-0 rounded-xl animate-pulse bg-green-400 opacity-10"></div>
+              </div>
+
+              <!-- Speaker Icon -->
+              <svg
+                v-show="!isLoaded || isSpeech"
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 transition-transform duration-150"
+                :class="{ 'animate-pulse': isSpeech }"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                />
+              </svg>
             </button>
+
+            <!-- Hidden audio element -->
+            <audio
+              ref="audioPlayer"
+              class="hidden"
+              @ended="handleAudioEnded"
+              @error="handleAudioError"
+            ></audio>
+
             <button
               @click="translateMessage"
               class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl
@@ -31,7 +68,20 @@
                      transition-all duration-150 ease-in-out
                      flex items-center gap-3"
             >
-              <!-- Button content remains the same -->
+              <svg
+                class="w-6 h-6 transform group-hover:rotate-12 transition-transform duration-150"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M5 8L10 13M4 14L10 8L12 5M2 5H14M7 2H8M12.913 17H20.087M12.913 17L11 21M12.913 17L15.7783 11.009C16.0092 10.5263 16.1246 10.2849 16.2826 10.2086C16.4199 10.1423 16.5801 10.1423 16.7174 10.2086C16.8754 10.2849 16.9908 10.5263 17.2217 11.009L20.087 17M20.087 17L22 21"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                />
+              </svg>
+              <span class="group-hover:translate-x-0.5 transition-transform duration-150">Translate</span>
             </button>
           </div>
         </div>
@@ -257,9 +307,13 @@ const speechData = async () => {
     const tabId = new URLSearchParams(window.location.search).get('tabId');
     const getStoreValue = useLocalStorage(`result-vn-${tabId}`);
 
+    if (getStoreValue.value !== 'undefined') {
+      convertedHtml.value = getStoreValue.value.replace(/<\/?[^>]+(>|$)/g, '');
+    }
+
     const audioSourceStore = await useLocalStorage(`audio-${tabId}`);
 
-    if (audioSourceStore.value) {
+    if (audioSourceStore.value !== 'undefined') {
       audioPlayer.value.src = audioSourceStore.value;
 
       const playPromise = audioPlayer.value.play()
@@ -279,7 +333,7 @@ const speechData = async () => {
       return
     }
 
-    const audioSource = await speech(getStoreValue.value.replace(/<\/?[^>]+(>|$)/g, ''), 'shimmer', 'tts-1');
+    const audioSource = await speech(convertedHtml.value, 'shimmer', 'tts-1');
 
     // save to local storage
     useLocalStorage(`audio-${tabId}`, audioSource);
