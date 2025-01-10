@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-6" v-if="convertedHtml">
     <div class="flex w-full max-w-4xl space-x-8 h-[calc(100vh-3rem)]">
-      <!-- Left Panel - Added max-height and overflow handling -->
+      <!-- Left Panel -->
       <div class="flex flex-col bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 w-full backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95
                   transform hover:scale-[1.02] transition-all duration-300 overflow-hidden">
         <div class="flex justify-between items-center flex-shrink-0">
@@ -86,13 +86,13 @@
           </div>
         </div>
 
-        <!-- Added overflow handling for content -->
+        <!-- Content area with overflow handling -->
         <div class="flex-1 overflow-y-auto">
           <div class="prose prose-lg dark:prose-invert max-w-none animate-slide-up" v-html="convertedHtml"></div>
         </div>
       </div>
 
-      <!-- Right Panel - Fixed height handling -->
+      <!-- Right Panel -->
       <div class="flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95">
         <div class="flex items-center justify-between mb-6 flex-shrink-0">
           <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Agent</h2>
@@ -103,7 +103,7 @@
           </div>
         </div>
 
-        <!-- Keywords section with fixed height -->
+        <!-- Keywords section -->
         <div class="bg-gray-50/50 dark:bg-gray-700/30 rounded-xl p-4 mb-6 backdrop-blur-sm flex-shrink-0 max-h-48 overflow-y-auto">
           <div class="flex flex-wrap gap-2">
             <span v-for="keyword in keys"
@@ -121,7 +121,7 @@
           </div>
         </div>
 
-        <!-- Messages section with dynamic height -->
+        <!-- Messages section -->
         <div class="flex-1 overflow-y-auto space-y-4 mb-6 pr-4
                     scrollbar-thin scrollbar-thumb-blue-500/20 hover:scrollbar-thumb-blue-500/40
                     scrollbar-track-transparent">
@@ -138,7 +138,7 @@
           </div>
         </div>
 
-        <!-- Input section at bottom -->
+        <!-- Input section -->
         <div class="flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-gray-700/30 rounded-xl backdrop-blur-sm flex-shrink-0">
           <input v-model="newMessage"
                  @keyup.enter="sendMessage"
@@ -160,6 +160,8 @@
       </div>
     </div>
   </div>
+
+  <!-- Loading state -->
   <div v-else class="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 p-6">
     <div class="animate-pulse flex space-x-4">
       <div class="rounded-full bg-blue-400 h-12 w-12"></div>
@@ -305,10 +307,11 @@ const translateMessage = async () => {
 const speechData = async () => {
   try {
     const tabId = new URLSearchParams(window.location.search).get('tabId');
+    /**
     const getStoreValue = useLocalStorage(`result-vn-${tabId}`);
 
     if (getStoreValue.value !== 'undefined') {
-      convertedHtml.value = getStoreValue.value.replace(/<\/?[^>]+(>|$)/g, '');
+      convertedHtml.value = getStoreValue.value;
     }
 
     const audioSourceStore = await useLocalStorage(`audio-${tabId}`);
@@ -331,7 +334,9 @@ const speechData = async () => {
           })
       }
       return
-    }
+    } **/
+
+    console.log("convertedHtml.value", convertedHtml.value.replace(/<\/?[^>]+(>|$)/g, ''));
 
     const audioSource = await speech(convertedHtml.value, 'shimmer', 'tts-1');
 
@@ -339,10 +344,7 @@ const speechData = async () => {
     useLocalStorage(`audio-${tabId}`, audioSource);
 
     if (audioPlayer.value) {
-      const audioSourceStore = await useLocalStorage(`audio-${tabId}`);
-      console.log("audioSourceStore", audioSourceStore.value);
-
-      audioPlayer.value.src = audioSourceStore.value ?? audioSource;
+      audioPlayer.value.src = audioSource;
 
       const playPromise = audioPlayer.value.play()
 
