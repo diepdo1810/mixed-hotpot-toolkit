@@ -3,7 +3,7 @@
     <div class="flex w-full max-w-4xl space-x-8 h-[calc(100vh-3rem)]">
       <!-- Left Panel -->
       <div class="flex flex-col bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8 w-full backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95
-                  transform hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+                  transform transition-all duration-300 overflow-hidden">
         <div class="flex justify-between items-center flex-shrink-0">
           <h1 class="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500 animate-fade-in">
             Full screen
@@ -93,69 +93,82 @@
       </div>
 
       <!-- Right Panel -->
-      <div class="flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full backdrop-blur-lg bg-opacity-95 dark:bg-opacity-95">
-        <div class="flex items-center justify-between mb-6 flex-shrink-0">
-          <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">Agent</h2>
-          <div class="flex items-center gap-2">
-            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600 dark:text-blue-400 text-sm font-medium">
-              Keywords: {{keys.length}}
-            </span>
-          </div>
+      <div id="app">
+        <!-- icon right -->
+        <div id="chatToggle" @click="handleChatToggle" class="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full cursor-pointer shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+          </svg>
         </div>
 
-        <!-- Keywords section -->
-        <div class="bg-gray-50/50 dark:bg-gray-700/30 rounded-xl p-4 mb-6 backdrop-blur-sm flex-shrink-0 max-h-48 overflow-y-auto">
-          <div class="flex flex-wrap gap-2">
-            <span v-for="keyword in keys"
-                  :key="keyword"
-                  @click="handleKeywordClick(keyword)"
-                  class="inline-flex items-center px-4 py-2 rounded-lg
-                         text-sm font-medium bg-white dark:bg-gray-800
-                         text-blue-600 dark:text-blue-400
-                         shadow-sm hover:shadow-md
-                         hover:bg-blue-50 dark:hover:bg-gray-700
-                         transition-all duration-200 cursor-pointer
-                         transform hover:scale-105 hover:-translate-y-0.5">
-              {{ keyword }}
+        <!-- Form chat  -->
+        <div id="chatContainer" class="fixed bottom-20 right-4 w-full max-w-md bg-white rounded-lg shadow-lg" v-if="isChatOpen">
+          <div class="p-4 border-b border-gray-200">
+            <h1 class="text-center text-xl font-semibold text-gray-800">
+              Agent newspaper
+            </h1>
+            <button id="closeChatBtn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700" @click="handleChatToggle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="flex justify-center mx-3 mt-3">
+            <span
+              class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600 dark:text-blue-400 text-sm font-medium">
+              Keywords: {{ keys.length }}
             </span>
           </div>
-        </div>
 
-        <!-- Messages section -->
-        <div class="flex-1 overflow-y-auto space-y-4 mb-6 pr-4
-                    scrollbar-thin scrollbar-thumb-blue-500/20 hover:scrollbar-thumb-blue-500/40
-                    scrollbar-track-transparent">
-          <div v-for="(message, index) in messages"
-               :key="index"
-               class="flex animate-fade-in"
-               :class="message?.sender === 'user' ? 'justify-end' : 'justify-start'">
-            <div class="max-w-[80%] p-4 rounded-2xl shadow-lg backdrop-blur-sm"
-                 :class="message?.sender === 'user'
-                   ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                   : 'bg-gray-50/90 dark:bg-gray-700/90 text-gray-800 dark:text-gray-200'">
-              <div v-html="message.text" class="prose dark:prose-invert max-w-none"></div>
+          <div class="bg-gray-50/50 dark:bg-gray-700/30 rounded-xl p-4 mb-6 backdrop-blur-sm flex-shrink-0 max-h-48 overflow-y-auto">
+            <div class="flex flex-wrap gap-2">
+              <span v-for="keyword in keys"
+                    :key="keyword"
+                    @click="handleKeywordClick(keyword)"
+                    class="inline-flex items-center px-4 py-2 rounded-lg
+                           text-sm font-medium bg-white dark:bg-gray-800
+                           text-blue-600 dark:text-blue-400
+                           shadow-sm hover:shadow-md
+                           hover:bg-blue-50 dark:hover:bg-gray-700
+                           transition-all duration-200 cursor-pointer
+                           transform hover:scale-105 hover:-translate-y-0.5">
+                {{ keyword }}
+              </span>
             </div>
           </div>
-        </div>
 
-        <!-- Input section -->
-        <div class="flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-gray-700/30 rounded-xl backdrop-blur-sm flex-shrink-0">
-          <input v-model="newMessage"
-                 @keyup.enter="sendMessage"
-                 placeholder="Enter your message..."
-                 class="flex-1 px-4 py-3 rounded-xl bg-white/50 dark:bg-gray-800/50
-                        border-0 focus:ring-2 focus:ring-blue-500/50
-                        text-gray-800 dark:text-gray-200
-                        placeholder-gray-400 dark:placeholder-gray-500
-                        transition-all duration-200" />
-          <button @click="sendMessage"
-                  class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600
-                         hover:from-blue-600 hover:to-blue-700
-                         text-white font-medium shadow-lg shadow-blue-500/25
-                         transform hover:-translate-y-0.5 active:translate-y-0
-                         transition-all duration-150">
-            Send
-          </button>
+          <div class="p-4 space-y-4 h-[440px] overflow-y-auto">
+            <div class="flex items-start space-x-2"
+                 v-for="(message, index) in messages" :key="index"
+                 :class="message?.sender === 'user' ? 'justify-end' : ''">
+              <img alt="AI avatar" class="w-10 h-10 rounded-full" v-if="message?.sender !== 'user'"
+                   src="https://image.pollinations.ai/prompt/A%20minimalist%20logo%20for%20a%20newspaper%20called%20%22Agent%2C%22%20featuring%20a%20bold%2C%20sans-serif%20font%20for%20the%20text%20%22Agent.%22%20The%20letter%20%22A%22%20is%20stylized%20as%20a%20magnifying%20glass%2C%20symbolizing%20investigation%20and%20discovery.%20The%20color%20palette%20is%20monochrome%20black%20and%20white%2C%20giving%20it%20a%20modern%20and%20professional%20appearance.%20The%20overall%20design%20exudes%20clarity%20and%20authority%2C%20ideal%20for%20a%20high-profile%20news%20publication.?seed=42&model=flux-pro&width=1024&height=1024"/>
+              <div class="p-3 rounded-lg max-w-[80%]" :class="message?.sender === 'user' ? 'bg-blue-500' : 'bg-gray-100'">
+                <p :class="message?.sender === 'user' ? '' : 'text-gray-700'" v-html="message.text"></p>
+
+              </div>
+            </div>
+          </div>
+          <div class="p-4 border-t border-gray-200">
+            <div class="flex items-center space-x-2">
+              <textarea
+                v-model="newMessage"
+                @keyup.enter="sendMessage"
+                class="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-[50px] max-h-[150px]"
+                placeholder="Type a message..."
+                rows="1"
+                style="overflow-y: auto;"
+              ></textarea>
+              <button class="bg-blue-500 text-white p-2 rounded-full" @click="sendMessage">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -197,6 +210,13 @@ const audioPlayer = ref<HTMLAudioElement | null>(null)
 const isLoaded = ref(false)
 const isDisabled = ref(false)
 const isSpeech = ref(false)
+
+const isChatOpen = ref(false)
+
+const handleChatToggle = () => {
+  isChatOpen.value = !isChatOpen.value
+}
+
 
 const handleAudioEnded = () => {
   isSpeech.value = false
