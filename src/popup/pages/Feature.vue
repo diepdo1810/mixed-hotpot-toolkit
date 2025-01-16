@@ -36,7 +36,7 @@ const fillCrawls = ref([
   {
     name: 'dantri.com.vn',
     incl: '.singular-content',
-    excl: 'image, .dantri-widget'
+    excl: ''
   },
   {
     name: 'www.indiehackers.com',
