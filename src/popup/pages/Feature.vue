@@ -35,11 +35,13 @@ const fillCrawl = ref('')
 const fillCrawls = ref([
   {
     name: 'dantri.com.vn',
-    incl: '.singular-container'
+    incl: '.singular-content',
+    excl: 'image, .dantri-widget'
   },
   {
     name: 'www.indiehackers.com',
-    incl: '.post-page__content'
+    incl: '.post-page__content',
+    excl: ''
   }
 ])
 
@@ -61,6 +63,7 @@ watch(() => url.value, (value) => {
 
     fillCrawl.value = fill?.name || ''
     include.value = fill?.incl || ''
+    exclude.value = fill?.excl || ''
   }
 })
 
@@ -227,11 +230,7 @@ const speechData = async () => {
 
   try {
     isSpeech.value = false
-    audioSrc.value = await speech(
-      result.value,
-      voice.value,
-      'speechify'
-    )
+    audioSrc.value = await speech(result.value)
     handleCrawlSuccess('Speechify text successfully')
   } catch (error) {
     handleCrawlError('Please check Settings to see if updates have been applied.')
@@ -265,12 +264,14 @@ const speechData = async () => {
           />
 
           <!-- Summary -->
+
           <ActionButton
             iconPath="M12 6.03v13m0-13c-2.819-.831-4.715-1.076-8.029-1.023A.99.99 0 0 0 3 6v11c0 .563.466 1.014 1.03 1.007 3.122-.043 5.018.212 7.97 1.023m0-13c2.819-.831 4.715-1.076 8.029-1.023A.99.99 0 0 1 21 6v11c0 .563-.466 1.014-1.03 1.007-3.122-.043-5.018.212-7.97 1.023"
             @click="toogleSummary"
             tooltipText="Summary Text"
             viewBox="0 0 24 24"
             :buttonClass="isSummary ? 'bg-purple-500 text-white' : 'bg-white text-gray-800'"
+            class="hidden"
           />
 
           <!-- Speech -->
@@ -280,6 +281,7 @@ const speechData = async () => {
             tooltipText="Speechify Text"
             viewBox="0 0 24 24"
             :buttonClass="isSpeech ? 'bg-orange-500 text-white' : 'bg-white text-gray-800'"
+            class="hidden"
           />
 
           <!-- Fullscreen -->

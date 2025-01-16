@@ -356,33 +356,45 @@ const speechData = async () => {
       return
     } **/
 
-    console.log("convertedHtml.value", convertedHtml.value.replace(/<\/?[^>]+(>|$)/g, ''));
+    // console.log("convertedHtml.value", convertedHtml.value.replace(/<\/?[^>]+(>|$)/g, ''));
+    const html = convertedHtml.value.replace(/<\/?[^>]+(>|$)/g, '');
+    const text = html.replace(/&nbsp;/g, ' ');
+    const words = text.split(' ');
+    const audioSources = [];
 
-    const audioSource = await speech(convertedHtml.value, 'shimmer', 'tts-1');
+    for (let i = 0; i < words.length; i += 120) {
+      const chunk = words.slice(i, i + 120).join(' ');
+      const encodeText = encodeURIComponent(chunk);
+      const audioSource = await speech(encodeText);
+      audioSources.push(audioSource);
+    }
 
-    // save to local storage
-    useLocalStorage(`audio-${tabId}`, audioSource);
+    const playAudioSequentially = async (sources) => {
+      for (const source of sources) {
+        audioPlayer.value.src = source;
+
+        try {
+          await audioPlayer.value.play();
+          isSpeech.value = true;
+          isLoaded.value = false;
+
+          await new Promise((resolve) => {
+            audioPlayer.value.onended = resolve;
+          });
+        } catch (error) {
+          console.error('Auto-play failed:', error);
+          isDisabled.value = false;
+          isLoaded.value = false;
+          break;
+        }
+      }
+    };
 
     if (audioPlayer.value) {
-      audioPlayer.value.src = audioSource;
-
-      const playPromise = audioPlayer.value.play()
-
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            isSpeech.value = true
-            isLoaded.value = false
-          })
-          .catch(error => {
-            console.error('Auto-play failed:', error)
-            isDisabled.value = false
-            isLoaded.value = false
-          })
-      }
+      await playAudioSequentially(audioSources);
     } else {
-      isDisabled.value = false
-      isLoaded.value = false
+      isDisabled.value = false;
+      isLoaded.value = false;
     }
   } catch (error) {
     console.error('Error speaking text:', error);
